@@ -13,4 +13,4 @@ def categorize_transaction(description):
             if keyword in description:
                 return category
     
-    return "other" 
+    return "other"

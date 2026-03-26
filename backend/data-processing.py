@@ -5,6 +5,14 @@ def load_data(path):
     df = pd.read_csv(path)
     return df
 
+def handle_missing_values(df):
+   df = df.dropna(subset=["date", "description", "amount"])
+   return df
+
+def remove_duplicates(df):
+   df = df.drop_duplicates()
+   return df
+
 def detect_amount_pattern(df):
    if (df["amount"] < 0).any():
       return "signed"
@@ -66,8 +74,11 @@ def process_data(path):
     df = load_data(path)
 
     df = map_columns(df)
-    print("Columns after mapping:", df.columns.tolist())
+    #print("Columns after mapping:", df.columns.tolist())
     validate_columns(df)
+
+    df = handle_missing_values(df)
+    df = remove_duplicates(df)
 
     df = normalize_amount(df)
     df = clean_data(df)
@@ -80,4 +91,4 @@ def process_data(path):
     return df
 
 df = process_data("/Users/timur/Downloads/Expenses_clean.csv")
-print(df[["amount", "type"]].head())
+print(df.head())
