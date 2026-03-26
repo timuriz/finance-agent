@@ -4,17 +4,9 @@ def load_data(path):
     df = pd.read_csv(path)
     return df
 
-if __name__ == "__main__":
-  df = load_data("/Users/timur/Downloads/Expenses_clean.csv")
-  #print(df.head())
-
-df_standarized = df["date_time"]
-
 def normalize_columns(df):
    df = df.rename(columns={"date_time": "date", "category": "description"})
    return df
-
-df = normalize_columns(df)
 
 def clean_data(df):
    df["date"] = pd.to_datetime(df["date"])
@@ -23,6 +15,9 @@ def clean_data(df):
 
    return df
 
-df = clean_data(df)
+if __name__ == "__main__":
+  df = load_data("/Users/timur/Downloads/Expenses_clean.csv")
+  df = normalize_columns(df)
+  df = clean_data(df)
 
 print(df.head())
