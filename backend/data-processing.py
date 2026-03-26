@@ -4,10 +4,6 @@ def load_data(path):
     df = pd.read_csv(path)
     return df
 
-def normalize_columns(df):
-   df = df.rename(columns={"date_time": "date", "category": "description"})
-   return df
-
 def clean_data(df):
    df["date"] = pd.to_datetime(df["date"])
    df["amount"] = df["amount"].astype(float)
@@ -15,9 +11,53 @@ def clean_data(df):
 
    return df
 
-if __name__ == "__main__":
-  df = load_data("/Users/timur/Downloads/Expenses_clean.csv")
-  df = normalize_columns(df)
-  df = clean_data(df)
+column_map = {"date": ["date", "date_time", "transaction_date", "time", "when"],
+              "description": ["description", "details", "about", "category"],
+               "amount": ["amount", "value", "sum"] }
 
-print(df.head())
+def map_columns(df):
+   df.columns = df.columns.str.lower().str.strip().str.replace(" ", "_")
+
+   mapping = {}
+
+   for standard_col, possible_names in column_map.items():
+      for col in df.columns:
+         if any(name in col for name in possible_names):
+            mapping[col] = standard_col
+   
+   df = df.rename(columns=mapping)
+   return df
+
+REQUIRED = ["date", "description", "amount"]
+
+def validate_columns(df):
+   for col in REQUIRED:
+      if col not in df.columns:
+         raise ValueError(f"Missing required column: {col}")
+
+def normalize_amount(df):
+   if "amount" in df.columns:
+      return df
+   
+   elif "debit" in df.columns and "credit" in df.columns:
+      df["amount"] = df["credit"] - df["debit"]
+      return df
+   
+   else:
+      raise ValueError("No valid amount column found")
+
+def process_data(path):
+    df = load_data(path)
+
+    df = map_columns(df)
+    print("Columns after mapping:", df.columns.tolist())
+    validate_columns(df)
+
+    df = normalize_amount(df)
+    df = clean_data(df)
+
+    df = df[["date", "description", "amount", "type"]]
+    
+    return df
+
+df = process_data("/Users/timur/Downloads/Expenses_clean.csv")
