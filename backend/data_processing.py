@@ -3,9 +3,10 @@ from categorization import categorize_transaction
 from analytics import total_spent, spending_by_category, top_category
 from anomaly_detection import detect_anomalies
 from report import generate_report
+from llm_insights import generate_ai_insight
 
 def load_data(path):
-    df = pd.read_csv(path)
+    df = pd.read_csv(path, sep=None, engine="python")
     return df
 
 def handle_missing_values(df):
@@ -23,7 +24,7 @@ def detect_amount_pattern(df):
       return "unsigned"
 
 def clean_data(df):
-   df["date"] = pd.to_datetime(df["date"])
+   df["date"] = pd.to_datetime(df["date"], format="mixed", dayfirst=True, errors="coerce")
    df["amount"] = df["amount"].astype(float)
    
    pattern = detect_amount_pattern(df)
@@ -104,4 +105,7 @@ if __name__ == "__main__":
 
    print(report)
 
-print(df[df["category"] == "other"]["description"].value_counts().head(20))
+   ai_text = generate_ai_insight(total, category_spending, anomalies)
+
+   print("\n--- AI INSIGHTS ---")
+   print(ai_text)
