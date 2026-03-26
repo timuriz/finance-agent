@@ -1,13 +1,29 @@
 import pandas as pd
+from categorization import categorize_transaction
 
 def load_data(path):
     df = pd.read_csv(path)
     return df
 
+def detect_amount_pattern(df):
+   if (df["amount"] < 0).any():
+      return "signed"
+   else:
+      return "unsigned"
+
 def clean_data(df):
    df["date"] = pd.to_datetime(df["date"])
    df["amount"] = df["amount"].astype(float)
-   df["type"] = df["amount"].apply(lambda x: "debit" if x < 0 else "credit")
+   
+   pattern = detect_amount_pattern(df)
+   
+   if pattern == "signed":
+      df["type"] = df["amount"].apply(lambda x: "debit" if x < 0 else "credit")
+   
+   elif pattern == "unsigned":
+    
+      df["amount"] = -df["amount"]
+      df["type"] = "debit"
 
    return df
 
@@ -57,7 +73,11 @@ def process_data(path):
     df = clean_data(df)
 
     df = df[["date", "description", "amount", "type"]]
-    
+
+    #df[["description"]] = categorize_transaction(df[["description"]])
+    df["category"] = df["description"].apply(categorize_transaction)
+
     return df
 
 df = process_data("/Users/timur/Downloads/Expenses_clean.csv")
+print(df[["amount", "type"]].head())
