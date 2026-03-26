@@ -1,6 +1,8 @@
 import pandas as pd
 from categorization import categorize_transaction
-from analytics import total_spend, spending_by_category
+from analytics import total_spent, spending_by_category, top_category
+from anomaly_detection import detect_anomalies
+from report import generate_report
 
 def load_data(path):
     df = pd.read_csv(path)
@@ -90,10 +92,16 @@ def process_data(path):
 
     return df
 
-df = process_data("/Users/timur/Downloads/Expenses_clean.csv")
+if __name__ == "__main__":
+   df = process_data("/Users/timur/Downloads/Expenses_clean.csv")
 
-print(df.head())
+   total = total_spent(df)
+   category_spending = spending_by_category(df)
+   top_cat = top_category(df)
+   anomalies = detect_anomalies(df)
 
-print(total_spend(df.head()))
+   report = generate_report(df, anomalies, total, category_spending, top_cat)
 
-print(spending_by_category(df.head()))
+   print(report)
+
+print(df[df["category"] == "other"]["description"].value_counts().head(20))
