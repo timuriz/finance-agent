@@ -1,0 +1,19 @@
+body {
+    font-family: 'Times New Roman', Times, serif;
+    padding: 20%;
+}
+
+input {
+    padding: 8px;
+    margin: 5px;
+}
+
+button {
+    padding: 8px 12px;
+}
+
+#report, #chatOutput {
+    background: #f4f4f4;
+    padding: 10px;
+    margin-top: 10px;
+}
