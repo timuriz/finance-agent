@@ -1,33 +1,32 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Finance Agent</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
 <body>
 
-    <h1>Finance Agent</h1>
+    <h1>💰 Finance Agent</h1>
 
     <!-- Upload -->
-    <div>
+    <div class="card">
+        <h2>Upload Transactions</h2>
         <input type="file" id="fileInput">
         <button onclick="uploadFile()">Upload CSV</button>
     </div>
 
-    
-    <div id="report">
+    <!-- Report -->
+    <div class="card">
         <h2>Report</h2>
-        <pre id="reportOutput"></pre>
+        <div id="reportOutput"></div>
     </div>
 
-   
-    <div>
+    <!-- Chat -->
+    <div class="card">
         <h2>Chat</h2>
-        <input type="text" id="chatInput" placeholder="Ask something...">
-        <button onclick="sendMessage()">Send</button>
-        <pre id="chatOutput"></pre>
+
+        <div id="chatOutput" class="chat-box"></div>
+
+        <div class="chat-input">
+            <input type="text" id="chatInput" placeholder="Ask something...">
+            <button onclick="sendMessage()">Send</button>
+        </div>
     </div>
 
-    <script src="app.js"></script>
 </body>
+<script src="app.js"></script>
 </html>

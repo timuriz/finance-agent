@@ -11,27 +11,51 @@ async function uploadFile() {
     });
     const data = await responce.json();
 
-    document.getElementById("reportOutput").innerText = JSON.stringify(data, null, 2);
+    const report = document.getElementById("reportOutput");
+
+    report.innerHTML = `
+        <p><strong>Total spent:</strong> $${Math.abs(data.total).toFixed(2)}</p>
+
+        <h3>Categories</h3>
+        <ul>
+            ${Object.entries(data.categories)
+                .map(([key, value]) =>
+                    `<li>${key}: $${Math.abs(value).toFixed(2)}</li>`
+                )
+                .join("")}
+        </ul>
+    `;
 }
 
 async function sendMessage() {
-    console.log("sending message...");
+    const input = document.getElementById("chatInput");
+    const chat = document.getElementById("chatOutput");
 
-    const input = document.getElementById("chatInput").value;
+    const message = input.value;
+
+    
+    const userMsg = document.createElement("div");
+    userMsg.className = "message user";
+    userMsg.textContent = message;
+    chat.appendChild(userMsg);
 
     const response = await fetch("http://127.0.0.1:8000/chat", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
         },
-        body: JSON.stringify({ message: input })
+        body: JSON.stringify({ message: message })
     });
 
     const data = await response.json();
 
-    console.log("response from backend:", data);
 
-    const output = document.getElementById("chatOutput");
+    const aiMsg = document.createElement("div");
+    aiMsg.className = "message ai";
+    aiMsg.textContent = data.response;
+    chat.appendChild(aiMsg);
 
-    output.textContent = data.response || "No response received";
+    input.value = "";
+
+    chat.scrollTop = chat.scrollHeight;
 }
