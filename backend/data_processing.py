@@ -4,6 +4,7 @@ from analytics import total_spent, spending_by_category, top_category
 from anomaly_detection import detect_anomalies
 from report import generate_report
 from llm_insights import generate_ai_insight
+from agent import run_agent
 
 def load_data(path):
     df = pd.read_csv(path, sep=None, engine="python")
@@ -101,11 +102,18 @@ if __name__ == "__main__":
    top_cat = top_category(df)
    anomalies = detect_anomalies(df)
 
-   report = generate_report(df, anomalies, total, category_spending, top_cat)
+   #report = generate_report(df, anomalies, total, category_spending, top_cat)
 
-   print(report)
+   #print(report)
 
-   ai_text = generate_ai_insight(total, category_spending, anomalies)
+   #ai_text = generate_ai_insight(total, category_spending, anomalies)
 
-   print("\n--- AI INSIGHTS ---")
-   print(ai_text)
+   #print("\n--- AI INSIGHTS ---")
+   #print(ai_text)
+   result = run_agent("How much i spent last week? And what i should to to spend less money", df.head(50))
+
+   print("\n--- DECISION ---")
+   print(result["decision"])
+
+   print("\n--- FINAL ANSWER ---")
+   print(result["answer"])
