@@ -1,73 +1,277 @@
 description,category
-Starbucks,food
-McDonalds,food
-Uber,transport
-Bus ticket,transport
-Netflix,entertainment
-Spotify,entertainment
-Amazon,shopping
-Zara,shopping
-Pharmacy,health
-Gym,health
-Salary,other
-Gift,other
-Pizza Hut,food
-KFC,food
-Subway sandwich,food
-Coffee shop,food
-Dinner restaurant,food
-Taxi ride,transport
-Train ticket,transport
-Metro card,transport
-Flight booking,transport
-Car rental,transport
-Cinema ticket,entertainment
-YouTube Premium,entertainment
-Concert ticket,entertainment
-Video game purchase,entertainment
-Online streaming,entertainment
-Ebay purchase,shopping
-Clothing store,shopping
-Electronics store,shopping
-Supermarket shopping,shopping
-Online order,shopping
-Doctor visit,health
-Hospital bill,health
-Dental care,health
-Medicine purchase,health
-Fitness class,health
-Freelance payment,other
-Bonus,other
-Investment return,other
-Lottery win,other
-Donation,other
-Ice cream,food
-Burger meal,food
-Food delivery,food
-Lunch cafe,food
-Bakery items,food
-Ride sharing,transport
-Fuel expense,transport
-Parking fee,transport
-Bike rental,transport
-Public transport,transport
-Music subscription,entertainment
-Streaming service,entertainment
-Theater ticket,entertainment
-Sports event,entertainment
-App purchase,entertainment
-Mall shopping,shopping
-Furniture purchase,shopping
-Grocery shopping,shopping
-Online marketplace,shopping
-Shoes purchase,shopping
-Health insurance,health
-Therapy session,health
-Vitamins,health
-Eye care,health
-Personal training,health
-Side income,other
-Cashback reward,other
-Refund,other
-Allowance,other
+Starbucks iced latte,food
+starbucks coffee,food
+STARBUCKS POS TXN,food
+Morning coffee at Starbucks,food
+Grabbed a latte (Starbucks),food
+McDonalds drive-thru order,food
+mcdonalds burger,food
+McD lunch combo,food
+Quick bite at McDonalds,food
+Uber ride to office,transport
+uber trip,transport
+UBER *TRIP CAIRO,transport
+Ride via Uber app,transport
+Late night uber ride,transport
+Bus ticket to downtown,transport
+bus pass recharge,transport
+City bus fare,transport
+Daily commute bus,transport
+Netflix monthly subscription,entertainment
+NETFLIX.COM,entertainment
+Netflix charge April,entertainment
+Streaming Netflix plan,entertainment
+Spotify premium plan,entertainment
+spotify charge,entertainment
+SPOTIFY ABONNEMENT,entertainment
+Music subscription Spotify,entertainment
+Amazon order #12345,shopping
+amazon purchase,shopping
+AMZN Mktp item,shopping
+Online Amazon shopping,shopping
+Zara new collection,shopping
+zara store purchase,shopping
+ZARA POS CAIRO,shopping
+Clothes shopping Zara,shopping
+Pharmacy meds,health
+pharmacy purchase,health
+Bought medicine at pharmacy,health
+OTC drugs purchase,health
+Gym membership fee,health
+gym monthly,health
+Fitness gym charge,health
+Paid gym subscription,health
+Salary credited,other
+SALARY TRANSFER,other
+Monthly salary deposit,other
+Company salary payment,other
+Birthday gift purchase,other
+gift for friend,other
+Bought a gift item,other
+Gift shop expense,other
+Pizza Hut order online,food
+pizza hut delivery,food
+PIZZA HUT CAIRO,food
+Dinner pizza order,food
+KFC takeaway,food
+kfc bucket meal,food
+KFC order #5566,food
+Chicken meal KFC,food
+Subway sandwich combo,food
+subway lunch,food
+SUBWAY STORE,food
+Quick sandwich subway,food
+Coffee shop cappuccino,food
+local cafe coffee,food
+Cafe morning breakfast,food
+Small coffee shop bill,food
+Dinner restaurant downtown,food
+restaurant dinner bill,food
+Evening dining out,food
+Family dinner restaurant,food
+Taxi ride airport,transport
+taxi fare,transport
+Local taxi payment,transport
+Taxi trip cash,transport
+Train ticket booking,transport
+train fare,transport
+Railway ticket purchase,transport
+Intercity train ride,transport
+Metro card recharge,transport
+metro pass,transport
+Metro balance top-up,transport
+Subway card payment,transport
+Flight booking online,transport
+flight ticket purchase,transport
+Airline booking,transport
+International flight fare,transport
+Cinema ticket online,entertainment
+movie ticket,entertainment
+Cinema evening show,entertainment
+Watched movie at cinema,entertainment
+YouTube Premium charge,entertainment
+youtube subscription,entertainment
+YT Premium fee,entertainment
+YouTube monthly plan,entertainment
+Concert ticket purchase,entertainment
+concert entry pass,entertainment
+Live concert ticket,entertainment
+Music event ticket,entertainment
+Ebay online order,shopping
+ebay purchase item,shopping
+E-commerce ebay order,shopping
+Bought item from ebay,shopping
+Supermarket groceries,shopping
+grocery store purchase,shopping
+Weekly supermarket bill,shopping
+Bought groceries,shopping
+Doctor consultation fee,health
+doctor visit,health
+Clinic checkup,health
+Medical consultation,health
+Hospital bill payment,health
+hospital expense,health
+Emergency hospital fee,health
+Paid hospital charges,health
+Freelance payment received,other
+freelance income,other
+Project payment,other
+Client paid invoice,other
+Bonus received,other
+bonus payout,other
+Performance bonus,other
+Company bonus transfer,other
+Refund processed,other
+refund from store,other
+Returned item refund,other
+Money refunded,other
 Misc expense,other
+random purchase,other
+Unknown charge,other
+Other expense,other
+description,category
+Starbucks latte,food
+Starbucks cappuccino,food
+Starbucks takeaway coffee,food
+McDonalds burger meal,food
+McDonalds combo order,food
+Uber ride downtown,transport
+Uber airport trip,transport
+Bus ticket daily commute,transport
+Bus ticket monthly pass,transport
+Netflix subscription monthly,entertainment
+Netflix premium plan,entertainment
+Spotify family plan,entertainment
+Spotify monthly subscription,entertainment
+Amazon online order electronics,shopping
+Amazon household items,shopping
+Zara clothing purchase,shopping
+Zara summer collection,shopping
+Pharmacy medicine purchase,health
+Pharmacy vitamins order,health
+Gym monthly membership,health
+Gym personal training session,health
+Salary monthly payment,other
+Salary bonus payout,other
+Gift birthday present,other
+Gift anniversary purchase,other
+Pizza Hut delivery order,food
+Pizza Hut dine-in meal,food
+KFC chicken bucket,food
+KFC takeaway meal,food
+Subway sandwich lunch,food
+Subway combo meal,food
+Coffee shop espresso,food
+Coffee shop breakfast,food
+Dinner restaurant bill,food
+Dinner restaurant with friends,food
+Taxi ride city center,transport
+Taxi ride late night,transport
+Train ticket intercity,transport
+Train ticket return trip,transport
+Metro card recharge,transport
+Metro card weekly pass,transport
+Flight booking international,transport
+Flight booking domestic,transport
+Car rental weekend trip,transport
+Car rental business trip,transport
+Cinema ticket evening show,entertainment
+Cinema ticket IMAX,entertainment
+YouTube Premium subscription,entertainment
+YouTube Premium yearly,entertainment
+Concert ticket VIP,entertainment
+Concert ticket general admission,entertainment
+Video game purchase online,entertainment
+Video game DLC purchase,entertainment
+Online streaming subscription,entertainment
+Online streaming movie rental,entertainment
+Ebay purchase electronics,shopping
+Ebay purchase collectibles,shopping
+Clothing store casual wear,shopping
+Clothing store formal wear,shopping
+Electronics store phone purchase,shopping
+Electronics store accessories,shopping
+Supermarket shopping groceries,shopping
+Supermarket shopping weekly,shopping
+Online order food delivery,shopping
+Online order household items,shopping
+Doctor visit consultation,health
+Doctor visit follow-up,health
+Hospital bill emergency,health
+Hospital bill surgery,health
+Dental care cleaning,health
+Dental care treatment,health
+Medicine purchase prescription,health
+Medicine purchase over-the-counter,health
+Fitness class yoga session,health
+Fitness class gym class,health
+Freelance payment project,other
+Freelance payment milestone,other
+Bonus yearly bonus,other
+Bonus performance bonus,other
+Investment return dividends,other
+Investment return stocks,other
+Lottery win small prize,other
+Lottery win jackpot,other
+Donation charity,other
+Donation fundraiser,other
+Ice cream dessert,food
+Ice cream takeaway,food
+Burger meal combo,food
+Burger meal takeaway,food
+Food delivery app order,food
+Food delivery dinner,food
+Lunch cafe sandwich,food
+Lunch cafe meal,food
+Bakery items bread,food
+Bakery items pastries,food
+Ride sharing commute,transport
+Ride sharing airport,transport
+Fuel expense gas refill,transport
+Fuel expense highway,transport
+Parking fee hourly,transport
+Parking fee daily,transport
+Bike rental city ride,transport
+Bike rental hourly,transport
+Public transport bus ride,transport
+Public transport metro ride,transport
+Music subscription premium,entertainment
+Music subscription family,entertainment
+Streaming service movies,entertainment
+Streaming service series,entertainment
+Theater ticket drama show,entertainment
+Theater ticket comedy show,entertainment
+Sports event football match,entertainment
+Sports event basketball game,entertainment
+App purchase premium upgrade,entertainment
+App purchase in-app item,entertainment
+Mall shopping fashion,shopping
+Mall shopping electronics,shopping
+Furniture purchase sofa,shopping
+Furniture purchase table,shopping
+Grocery shopping fresh produce,shopping
+Grocery shopping weekly stock,shopping
+Online marketplace order,shopping
+Online marketplace bulk buy,shopping
+Shoes purchase sneakers,shopping
+Shoes purchase formal,shopping
+Health insurance monthly premium,health
+Health insurance yearly plan,health
+Therapy session counseling,health
+Therapy session mental health,health
+Vitamins supplements,health
+Vitamins daily intake,health
+Eye care glasses purchase,health
+Eye care checkup,health
+Personal training fitness session,health
+Personal training package,health
+Side income online sales,other
+Side income gig work,other
+Cashback reward credit card,other
+Cashback reward app,other
+Refund returned item,other
+Refund canceled order,other
+Allowance monthly allowance,other
+Allowance weekly allowance,other
+Misc expense random purchase,other
+Misc expense unexpected,other

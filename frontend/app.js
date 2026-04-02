@@ -11,7 +11,7 @@ async function uploadFile() {
     });
     const data = await responce.json();
 
-    const report = document.getElementById("reportOutput");
+    const report = document.getElementById("reportOutput"); 
 
     report.innerHTML = `
         <p><strong>Total spent:</strong> $${Math.abs(data.total).toFixed(2)}</p>
@@ -36,7 +36,7 @@ async function sendMessage() {
     
     const userMsg = document.createElement("div");
     userMsg.className = "message user";
-    userMsg.textContent = message;
+    userMsg.innerHTML = `<strong>You:</strong> ${message}`;
     chat.appendChild(userMsg);
 
     const response = await fetch("http://127.0.0.1:8000/chat", {
@@ -52,10 +52,18 @@ async function sendMessage() {
 
     const aiMsg = document.createElement("div");
     aiMsg.className = "message ai";
-    aiMsg.textContent = data.response;
+
+    if (!data.response) {
+        aiMsg.textContent = "⚠️ No response from AI";
+    } else {
+        let formatted = data.response
+            .replace(/\n/g, "<br>")
+            .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+
+        aiMsg.innerHTML = `<strong>AI:</strong><br>` + formatted;
+    }
+
     chat.appendChild(aiMsg);
 
-    input.value = "";
-
-    chat.scrollTop = chat.scrollHeight;
+    chat.scrollTop = chat.scrollHeight; 
 }

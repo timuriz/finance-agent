@@ -45,13 +45,15 @@ input {
     background: #f9fafb;
     border-radius: 10px;
     margin-bottom: 10px;
+    gap: 10px;
 }
 
 .message {
     padding: 10px 14px;
     border-radius: 10px;
-    margin: 8px 0;
+    margin: 12px 0;
     max-width: 75%;
+    line-height: 1.4;
 }
 
 .user {
