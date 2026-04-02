@@ -1,0 +1,73 @@
+description,category
+Starbucks,food
+McDonalds,food
+Uber,transport
+Bus ticket,transport
+Netflix,entertainment
+Spotify,entertainment
+Amazon,shopping
+Zara,shopping
+Pharmacy,health
+Gym,health
+Salary,other
+Gift,other
+Pizza Hut,food
+KFC,food
+Subway sandwich,food
+Coffee shop,food
+Dinner restaurant,food
+Taxi ride,transport
+Train ticket,transport
+Metro card,transport
+Flight booking,transport
+Car rental,transport
+Cinema ticket,entertainment
+YouTube Premium,entertainment
+Concert ticket,entertainment
+Video game purchase,entertainment
+Online streaming,entertainment
+Ebay purchase,shopping
+Clothing store,shopping
+Electronics store,shopping
+Supermarket shopping,shopping
+Online order,shopping
+Doctor visit,health
+Hospital bill,health
+Dental care,health
+Medicine purchase,health
+Fitness class,health
+Freelance payment,other
+Bonus,other
+Investment return,other
+Lottery win,other
+Donation,other
+Ice cream,food
+Burger meal,food
+Food delivery,food
+Lunch cafe,food
+Bakery items,food
+Ride sharing,transport
+Fuel expense,transport
+Parking fee,transport
+Bike rental,transport
+Public transport,transport
+Music subscription,entertainment
+Streaming service,entertainment
+Theater ticket,entertainment
+Sports event,entertainment
+App purchase,entertainment
+Mall shopping,shopping
+Furniture purchase,shopping
+Grocery shopping,shopping
+Online marketplace,shopping
+Shoes purchase,shopping
+Health insurance,health
+Therapy session,health
+Vitamins,health
+Eye care,health
+Personal training,health
+Side income,other
+Cashback reward,other
+Refund,other
+Allowance,other
+Misc expense,other
