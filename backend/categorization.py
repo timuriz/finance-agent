@@ -5,11 +5,18 @@ with open("../models/category_model.pkl", "rb") as f:
 
 
 def categorize_transaction(description):
-    try:
-        X = vectorizer.transform([description])
-        return model.predict(X)[0]
-    except:
-        return "other"
+    description = description.lower()
+
+    X = vectorizer.transform([description])
+    
+    probs = model.predict_proba(X)[0]
+    max_prob = max(probs)
+    
+    if max_prob < 0.:
+        return "Other"
+    
+    return model.predict(X)[0]
+    
 
 
 
@@ -30,8 +37,3 @@ def categorize_transaction_fallback(description):
                 return category
     
     return "other"
-
-
-print(categorize_transaction("Metro"))
-print(categorize_transaction("Cafe"))
-print(categorize_transaction("Loan"))
