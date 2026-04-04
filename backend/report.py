@@ -1,19 +1,21 @@
-def generate_report(df, anomalies, total, category_spending, top_cat):
-    report = f"""
-FINANCIAL REPORT
-================
+from analytics import top_category, detect_overspending
 
+
+def generate_report(df, anomalies):
+    total = abs(df["amount"].sum())
+    top = top_category(df)
+    overspending = detect_overspending(df)
+
+    return f"""
 Summary:
-Total spent: {abs(total):.2f}
+Total spent: {total:.2f}
 
-Top spending category:
-{top_cat}
+Top category:
+{top}
 
-Spending breakdown:
-{category_spending}
+Overspending:
+{overspending.to_dict()}
 
-Anomalies detected:
+Anomalies:
 {len(anomalies)} unusual transactions
-
 """
-    return report
