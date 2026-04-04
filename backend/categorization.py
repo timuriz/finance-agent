@@ -1,22 +1,33 @@
 import pickle
 
-with open("../models/category_model.pkl", "rb") as f:
+
+
+with open("finance-agent/models/category_model.pkl", "rb") as f:
     vectorizer, model = pickle.load(f)
 
 
 def categorize_transaction(description):
     description = description.lower()
 
-    X = vectorizer.transform([description])
+    try:
+        X = vectorizer.transform([description])
+        
+        probs = model.predict_proba(X)[0]
+        
+        max_prob = max(probs)
+        
+        if max_prob > 0.4:
+            return model.predict(X)[0]
+    except:
+        pass
+    description = description.lower().strip().replace(" ", "_")
+
+    for category, keywords in CATEGORY_RULES.items():
+        for keyword in keywords:
+            if keyword in description:
+                return category
     
-    probs = model.predict_proba(X)[0]
-    max_prob = max(probs)
-    
-    if max_prob < 0.:
-        return "Other"
-    
-    return model.predict(X)[0]
-    
+    return "Other"
 
 
 
@@ -36,4 +47,4 @@ def categorize_transaction_fallback(description):
             if keyword in description:
                 return category
     
-    return "other"
+    return "Other"
