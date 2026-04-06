@@ -1,9 +1,9 @@
-from fastapi import FastAPI, UploadFile
+from fastapi import FastAPI, UploadFile, Form
 from fastapi.middleware.cors import CORSMiddleware
 
 import io
 
-from data_processing import process_data, total_spent, spending_by_category, category_by_percentage
+from data_processing import process_data, total_spent, spending_by_category, convert_to_base
 from agent import run_agent
 
 app = FastAPI()
@@ -20,7 +20,7 @@ GLOBAL_DF = None
 
 
 @app.post("/analyze")
-async def analyze(file: UploadFile, currency = "USD"):
+async def analyze(file: UploadFile, currency = Form(default="USD")):
     contents = await file.read()
 
     df = process_data(io.StringIO(contents.decode()))

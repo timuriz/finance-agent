@@ -1,15 +1,10 @@
 async function uploadFile() {
     const fileInput = document.getElementById("fileInput");
     const file = fileInput.files[0];
-
-    <select id="currencySelect">
-        <option value="USD">USD</option>
-        <option value="EUR">EUR</option>
-        <option value="GBP">GBP</option>
-    </select>
         
     const formData = new FormData();
     formData.append("file", file);
+    formData.append("currency", document.getElementById("currencySelect").value);
 
     const response = await fetch("http://127.0.0.1:8000/analyze", {
         method: "POST",
@@ -23,7 +18,7 @@ async function uploadFile() {
     const maxValue = Math.max(...values);
  
     report.innerHTML = `
-        <p><strong>Total spent:</strong> $${(data.total_display)}</p>
+        <p><strong>Total spent:</strong> ${data.total_display} ${data.currency}</p>
         <h3>Categories</h3>
         <div class="chart">
             ${Object.entries(data.categories)
@@ -35,7 +30,7 @@ async function uploadFile() {
                             <span class="chart-label">${category}</span>
                             <div class="chart-bar-wrap">
                                 <div class="chart-bar" style="width: ${pct}%"></div>
-                                <span class="chart-value">$${abs.toFixed(2)}</span>
+                                <span class="chart-value">${abs.toFixed(2)} ${data.currency}</span>
                             </div>
                         </div>`;
                 })

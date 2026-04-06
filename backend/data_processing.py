@@ -1,6 +1,6 @@
 import pandas as pd
 import re
-import request
+import requests
 from categorization import categorize_transaction
 from anomaly_detection import detect_anomalies
 
@@ -27,15 +27,21 @@ def detect_amount_pattern(df):
       return "unsigned"
 
 def parse_amount(value):
-   if isinstance(value, str):
-      cleaned = value.strip().replace(",", ".").replace(" ", "")
-      cleaned = re.sub(r"[^\d.\-]", "", cleaned)
-      return float(cleaned)
-   return float(value)
-
+    if isinstance(value, str):
+        cleaned = value.strip().replace(",", ".").replace(" ", "")
+        cleaned = re.sub(r"[^\d.\-]", "", cleaned)
+        if not cleaned or cleaned == "-":
+            return 0.0
+        return float(cleaned)
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return 0.0
+      
+   
 def clean_data(df):
    df["date"] = pd.to_datetime(df["date"], format="mixed", dayfirst=True, errors="coerce")
-   df["amount"] = df["amount"].astype(parse_amount)
+   df["amount"] = df["amount"].apply(parse_amount)
    
    pattern = detect_amount_pattern(df)
    
@@ -49,9 +55,9 @@ def clean_data(df):
 
    return df
 
-def get_exchange_rates(base="USD")
-   response = request.get(f"https://api.frankfurter.app/latest?base={base}")
-   return response.json()["rates"]
+def get_exchange_rates(base="USD"):
+    response = requests.get(f"https://api.frankfurter.dev/v1/latest?base={base}")
+    return response.json()["rates"]
 
 def convert_to_base(df, base_currency="USD"):
    if "currency" not in df.columns:
@@ -71,28 +77,31 @@ def convert_to_base(df, base_currency="USD"):
    df["amount"] = df.apply(convert, axis=1)
    df["currency"] = base_currency
    return df
-   
 
 
-column_map = {"date": ["date", "date_time", "transaction_date", "time", "when"],
-              "description": ["description", "details", "about", "category"],
-               "amount": ["amount", "value", "sum"]
-               "currency": ["currency", "ccy", "curr"] }
+
+column_map = {
+    "date":        ["date", "date_time", "transaction_date", "time", "when"],
+    "description": ["description", "details", "about"],
+    "amount":      ["operation_amount", "transaction_amount", "amount", "value", "sum"],
+    "currency":    ["operation_currency", "currency", "ccy", "curr"],
+}
 
 
 def map_columns(df):
-   df.columns = df.columns.str.lower().str.strip().str.replace(" ", "_")
+    df.columns = df.columns.str.lower().str.strip().str.replace(" ", "_")
+    mapping = {}
 
-   mapping = {}
+    for standard_col, possible_names in column_map.items():
+        for col in df.columns:
+            if col in mapping:        # already mapped to something else, skip
+                continue
+            if any(name in col for name in possible_names):
+                mapping[col] = standard_col
+                break                 # stop after first match per standard column
 
-   for standard_col, possible_names in column_map.items():
-      for col in df.columns:
-         if any(name in col for name in possible_names):
-            mapping[col] = standard_col
-            break
-   
-   df = df.rename(columns=mapping)
-   return df
+    df = df.rename(columns=mapping)
+    return df
 
 REQUIRED = ["date", "description", "amount"]
 
@@ -132,7 +141,7 @@ def detect_overspending(df):
     return percentages[percentages > 30]
 
 def date_range(df, start_date, end_date):
-   return df[[date] >= start_date] & df[[date] <= end_date]
+   return df[["date"] >= start_date] & df[["date"] <= end_date]
 
 
 
@@ -140,7 +149,7 @@ def process_data(path):
     df = load_data(path)
 
     df = map_columns(df)
-    #print("Columns after mapping:", df.columns.tolist())
+    print("Columns after mapping:", df.columns.tolist())
     validate_columns(df)
 
     df = handle_missing_values(df)
@@ -149,7 +158,10 @@ def process_data(path):
     df = normalize_amount(df)
     df = clean_data(df)
 
-    df = df[["date", "description", "amount", "type"]]
+    cols = ["date", "description", "amount", "type"]
+    if "currency" in df.columns:
+        cols.append("currency")
+    df = df[cols]
 
     df["category"] = df["description"].apply(categorize_transaction)
 
