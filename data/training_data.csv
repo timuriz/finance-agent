@@ -129,7 +129,6 @@ Misc expense,other
 random purchase,other
 Unknown charge,other
 Other expense,other
-description,category
 Starbucks latte,food
 Starbucks cappuccino,food
 Starbucks takeaway coffee,food
@@ -275,3 +274,280 @@ Allowance monthly allowance,other
 Allowance weekly allowance,other
 Misc expense random purchase,other
 Misc expense unexpected,other
+Starbucks mocha grande,food
+STARBUCKS LATTE POS,food
+Starbucks drive thru coffee,food
+iced caramel macchiato sbux,food
+sbux morning drink,food
+Costa coffee cappuccino,food
+COSTA COFFEE BILL,food
+Dunkin donuts coffee,food
+DUNKIN order coffee,food
+Tim Hortons breakfast coffee,food
+Cafe Nero latte,food
+local cafe tea,food
+tea shop purchase,food
+bubble tea order,food
+boba tea drink,food
+restaurant brunch bill,food
+brunch with friends cafe,food
+fine dining restaurant bill,food
+fast food combo meal,food
+fastfood takeaway order,food
+burger king whopper meal,food
+BURGER KING POS,food
+Hardees burger combo,food
+dominos pizza order,food
+DOMINOS ONLINE,food
+dominos delivery pizza,food
+foodpanda order,food
+talabat food delivery,food
+ubereats order food,food
+UBER EATS CHARGE,food
+deliveroo food order,food
+meal subscription service,food
+hello fresh meal kit,food
+home cooked meal groceries,food
+snack purchase chips,food
+chocolate bar purchase,food
+bakery cake order,food
+birthday cake bakery,food
+dessert shop bill,food
+ice cream shop bill,food
+gelato purchase,food
+coffee beans purchase,food
+restaurant service charge,food
+tip restaurant waiter,food
+dining out expense,food
+takeaway lunch order,food
+lunch meal office,food
+breakfast sandwich purchase,food
+hotel restaurant bill,food
+buffet dinner hotel,food
+airport food purchase,food
+airport cafe bill,food
+
+uber ride downtown cairo,transport
+uber ride alexandria,transport
+UBER TRIP EGYPT,transport
+careem ride booking,transport
+CAREEM TRIP,transport
+bolt ride payment,transport
+ride sharing app fare,transport
+taxi uber alternative,transport
+local taxi uber cash,transport
+airport transfer uber,transport
+bus ticket cairo transit,transport
+bus fare card recharge,transport
+bus subscription monthly,transport
+minibus fare,transport
+shared van ride,transport
+metro ticket cairo,transport
+metro daily commute,transport
+subway ride fare,transport
+train ticket egypt rail,transport
+egypt rail booking,transport
+railway ticket online,transport
+flight egyptair booking,transport
+EGYPTAIR PAYMENT,transport
+air ticket expedia,transport
+travel agency flight,transport
+uber scooter ride,transport
+bike ride rental app,transport
+electric scooter rental,transport
+fuel gas station shell,transport
+SHELL FUEL,transport
+total gas refill,transport
+parking garage fee,transport
+parking meter payment,transport
+toll road fee,transport
+highway toll charge,transport
+car maintenance service,transport
+car wash service,transport
+vehicle repair cost,transport
+oil change service,transport
+car insurance premium,transport
+uber business ride,transport
+ride share office commute,transport
+late night taxi ride,transport
+hotel shuttle service,transport
+airport limo service,transport
+
+netflix subscription renewal,entertainment
+NETFLIX INTL,entertainment
+spotify student plan,entertainment
+SPOTIFY FAMILY,entertainment
+apple music subscription,entertainment
+APPLE MUSIC BILL,entertainment
+youtube premium family,entertainment
+YOUTUBE GOOGLE,entertainment
+amazon prime video,entertainment
+prime video subscription,entertainment
+disney plus subscription,entertainment
+DISNEY+ BILL,entertainment
+hbo max subscription,entertainment
+streaming platform charge,entertainment
+movie rental google play,entertainment
+itunes movie rental,entertainment
+cinema vox ticket,entertainment
+imax movie ticket,entertainment
+movie snacks purchase,entertainment
+popcorn cinema,entertainment
+concert ticket ticketmaster,entertainment
+ticketmaster purchase,entertainment
+live show ticket,entertainment
+festival entry ticket,entertainment
+music streaming charge,entertainment
+podcast subscription,entertainment
+gaming subscription xbox,entertainment
+XBOX GAME PASS,entertainment
+playstation plus subscription,entertainment
+PSN PURCHASE,entertainment
+steam game purchase,entertainment
+STEAM GAMES,entertainment
+mobile game purchase,entertainment
+in-app purchase coins,entertainment
+app store purchase game,entertainment
+google play purchase,entertainment
+kindle ebook purchase,entertainment
+ebook subscription,entertainment
+audiobook audible,entertainment
+audible subscription,entertainment
+sports streaming subscription,entertainment
+match ticket football,entertainment
+stadium ticket entry,entertainment
+bowling alley game,entertainment
+arcade games payment,entertainment
+
+amazon order electronics,shopping
+AMZN DIGITAL,shopping
+noon order online,shopping
+NOON.COM PURCHASE,shopping
+jumia order egypt,shopping
+JUMIA ONLINE,shopping
+aliexpress order item,shopping
+ALIEXPRESS PAYMENT,shopping
+shein clothing order,shopping
+SHEIN SHOPPING,shopping
+hm clothing store,shopping
+H&M PURCHASE,shopping
+nike store shoes,shopping
+NIKE POS,shopping
+adidas purchase,shopping
+ADIDAS STORE,shopping
+electronics store tv,shopping
+mobile phone purchase,shopping
+iphone purchase apple store,shopping
+laptop purchase dell,shopping
+computer accessories,shopping
+headphones purchase,shopping
+smart watch purchase,shopping
+home appliances fridge,shopping
+washing machine purchase,shopping
+ikea furniture purchase,shopping
+IKEA BILL,shopping
+home decor items,shopping
+kitchen utensils purchase,shopping
+supermarket carrefour,shopping
+CARREFOUR EGYPT,shopping
+spinneys grocery bill,shopping
+metro market groceries,shopping
+fresh vegetables market,shopping
+butcher meat purchase,shopping
+fish market purchase,shopping
+online grocery instashop,shopping
+INSTASHOP ORDER,shopping
+pharmacy retail items,shopping
+cosmetics purchase sephora,shopping
+SEPHORA BILL,shopping
+makeup products purchase,shopping
+perfume purchase,shopping
+gift shop mall,shopping
+mall retail purchase,shopping
+clothing accessories purchase,shopping
+bags purchase,shopping
+wallet purchase,shopping
+
+pharmacy prescription meds,health
+prescription refill pharmacy,health
+antibiotics purchase,health
+painkiller meds purchase,health
+ibuprofen pharmacy,health
+vitamin c purchase,health
+supplements purchase gym,health
+protein powder purchase,health
+doctor appointment fee,health
+specialist doctor fee,health
+clinic lab test,health
+blood test lab,health
+xray scan payment,health
+mri scan cost,health
+hospital admission fee,health
+surgery hospital bill,health
+emergency room visit,health
+dentist visit cleaning,health
+dentist cavity filling,health
+orthodontist payment,health
+eye doctor appointment,health
+optician glasses purchase,health
+contact lenses purchase,health
+therapy counseling session,health
+mental health consultation,health
+psychologist visit,health
+psychiatrist appointment,health
+gym membership annual,health
+fitness club membership,health
+crossfit gym fee,health
+yoga class subscription,health
+pilates session,health
+spa wellness treatment,health
+massage therapy session,health
+health insurance claim,health
+insurance medical premium,health
+nutritionist consultation,health
+diet program subscription,health
+weight loss program,health
+
+salary march credit,other
+salary bonus april,other
+salary arrears payment,other
+freelance gig payment,other
+upwork payment received,other
+fiverr income,other
+client wire transfer,other
+bank transfer received,other
+cash deposit atm,other
+atm withdrawal fee,other
+bank charges fee,other
+service fee bank,other
+interest income bank,other
+investment dividend payout,other
+stock profit realized,other
+crypto gain deposit,other
+refund amazon order,other
+refund airline ticket,other
+chargeback processed,other
+reversal transaction,other
+gift purchase birthday,other
+anniversary gift expense,other
+wedding gift purchase,other
+charity donation zakat,other
+donation ngo payment,other
+school fee payment,other
+tuition fee payment,other
+utility bill electricity,other
+electric bill payment,other
+water bill payment,other
+internet bill payment,other
+mobile recharge vodafone,other
+vodafone bill payment,other
+orange telecom bill,other
+etisalat recharge,other
+rent payment apartment,other
+monthly rent transfer,other
+maintenance fee building,other
+subscription random service,other
+unknown pos transaction,other
+unrecognized charge,other
+miscellaneous expense,other
+general expense uncategorized,other

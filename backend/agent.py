@@ -1,36 +1,116 @@
-from analytics import total_spent, top_category, spending_by_category
+from data_processing import (
+    total_spent,
+    top_category,
+    spending_by_category,
+    detect_overspending,
+    date_range
+)
 from anomaly_detection import detect_anomalies
+import json
 import google.generativeai as genai
 import os
+from datetime import date
+import pandas as pd
 
-def get_anomalies(df):
-    anomalies = detect_anomalies(df)
-    return anomalies[["description", "amount"]].to_dict(orient="records")
+# ------------------------
+# TOOL DEFINITIONS
+# ------------------------
+
+TOOLS = {
+    "get_summary": "Returns total spending and top category",
+    "get_category_breakdown": "Returns spending per category",
+    "get_anomalies": "Returns unusual transactions",
+    "get_overspending": "Returns categories with high spending",
+}
+
+
+def get_summary(df):
+    return {
+        "total_spent": abs(total_spent(df)),
+        "top_category": top_category(df)
+    }
+
+
+
 
 def get_category_breakdown(df):
     return spending_by_category(df).to_dict()
 
-def get_summary(df):
-    return{
-        "total spent": abs(total_spent(df)),
-        "total category": top_category(df)
-    }
+
+def get_anomalies_tool(df):
+    anomalies = detect_anomalies(df)
+    return anomalies[["description", "amount"]].to_dict(orient="records")
+
+
+def get_overspending_tool(df):
+    return detect_overspending(df).to_dict()
+
+def get_date_range(df, sd, ed):
+    return date_range(df, sd, ed).to_dict()
+
+
+# ------------------------
+# TOOL EXECUTION
+# ------------------------
 
 def execute_tool(tool_name, df):
     if tool_name == "get_summary":
         return get_summary(df)
+
     elif tool_name == "get_category_breakdown":
         return get_category_breakdown(df)
-    elif tool_name == "get_anomalies":
-        return get_anomalies(df)
-    else: 
-        return "Uknown tool"
 
-def extract_tool(responce_text):
-    for line in responce_text.split("\n"):
+    elif tool_name == "get_anomalies":
+        return get_anomalies_tool(df)
+
+    elif tool_name == "get_overspending":
+        return get_overspending_tool(df)
+
+    else:
+        return {"error": "Unknown tool"}
+
+
+# ------------------------
+# TOOL EXTRACTION
+# ------------------------
+
+def extract_tool(response_text):
+    for line in response_text.split("\n"):
         if "Tool:" in line:
+            print(line.split("Tool:")[1].strip())
             return line.split("Tool:")[1].strip()
     return None
+
+
+# ------------------------
+# PROMPTS
+# ------------------------
+
+def build_decision_prompt(user_query):
+    today = date.today().isoformat()
+    return f"""
+You are a financial assistant agent. Todai is {today}
+
+You MUST choose ONE tool, and extract any date from user message.
+
+TOOLS:
+- get_summary
+- get_category_breakdown
+- get_anomalies
+- get_overspending
+- get_date_range
+
+USER QUESTION:
+{user_query}
+
+Respond obly with valid JSON, no markdown, no explanation:\n like:
+{{
+  "tool": "<tool_name>",
+  "start_date": "<YYYY-MM-DD or null>",
+  "end_date": "<YYYY-MM-DD or null>",
+  "reason": "<brief reason>"
+}}
+"""
 
 def build_explanation_prompt(user_query, tool_result):
     return f"""
@@ -48,41 +128,50 @@ Do NOT mention tools.
 Be concise.
 """
 
-genai.configure(api_key=os.environ["GOOGLE_API_KEY"])
 
+# ------------------------
+# LLM SETUP
+# ------------------------
+
+genai.configure(api_key=os.environ["GOOGLE_API_KEY"])
 model = genai.GenerativeModel("gemini-3-flash-preview")
 
+
+# ------------------------
+# MAIN AGENT FUNCTION
+# ------------------------
+
 def run_agent(user_query, df):
+    prompt = build_decision_prompt(user_query)
+    response = model.generate_content(prompt)
     
-    decision_prompt = f"""
-You are a financial assistant agent.
-
-You MUST choose ONE tool.
-
-TOOLS:
-- get_summary
-- get_category_breakdown
-- get_anomalies
-
-USER QUESTION:
-{user_query}
-
-Respond EXACTLY like:
-Tool: <tool_name>
-Reason: <why>
-"""
+    # Parse JSON from LLM
+    try:
+        decision = json.loads(response.text.strip())
+    except json.JSONDecodeError:
+        return {"answer": "I couldn't understand that question."}
     
-    decision_response = model.generate_content(decision_prompt)
-    decision_text = decision_response.text
+    tool = decision.get("tool")
+    start_date = decision.get("start_date") 
+    end_date = decision.get("end_date")     
+    
+    if tool not in TOOLS:
+        return {"answer": "I couldn't determine the correct tool to use."}
+    
+    filtered_df = df.copy()
+    if start_date:
+        filtered_df = filtered_df[filtered_df["date"] >= pd.Timestamp(start_date)]
+    if end_date:
+        filtered_df = filtered_df[filtered_df["date"] <= pd.Timestamp(end_date)]
 
-    tool = extract_tool(decision_text)
-
-    tool_result = execute_tool(tool, df)
-
+    if filtered_df.empty:
+        date_range_str = f"{start_date} to {end_date}" if start_date else "that period"
+        return {"answer": f"No transaction found for {date_range_str}."}
+    
+    
+    tool_result = execute_tool(tool, filtered_df)
+    
     explanation_prompt = build_explanation_prompt(user_query, tool_result)
     explanation_response = model.generate_content(explanation_prompt)
-
-    return {
-        "decision": decision_text,
-        "answer": explanation_response.text
-    }
+    
+    return {"decision": decision, "answer": explanation_response.text}

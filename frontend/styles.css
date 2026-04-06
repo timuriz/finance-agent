@@ -66,3 +66,45 @@ input {
     background: #e5e7eb;
     color: black;
 }
+.chart {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.chart-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.chart-label {
+    width: 110px;
+    text-align: right;
+    font-size: 0.9rem;
+    color: #374151;
+    text-transform: capitalize;
+    flex-shrink: 0;
+}
+
+.chart-bar-wrap {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.chart-bar {
+    height: 22px;
+    background: #2563eb;
+    border-radius: 4px;
+    transition: width 0.4s ease;
+    min-width: 4px;
+}
+
+.chart-value {
+    font-size: 0.85rem;
+    color: #6b7280;
+    white-space: nowrap;
+}

@@ -1,10 +1,6 @@
 import pandas as pd
 from categorization import categorize_transaction
-from analytics import total_spent, spending_by_category, top_category
 from anomaly_detection import detect_anomalies
-from report import generate_report
-from llm_insights import generate_ai_insight
-from agent import run_agent
 
 def load_data(path):
     df = pd.read_csv(path, sep=None, engine="python")
@@ -53,6 +49,7 @@ def map_columns(df):
       for col in df.columns:
          if any(name in col for name in possible_names):
             mapping[col] = standard_col
+            break
    
    df = df.rename(columns=mapping)
    return df
@@ -74,6 +71,28 @@ def normalize_amount(df):
    
    else:
       raise ValueError("No valid amount column found")
+   
+def total_spent(df):
+    return df["amount"].sum()
+
+def spending_by_category(df):
+    return df.groupby("category")["amount"].sum().sort_values()
+
+def top_category(df):
+    return df.groupby("category")["amount"].sum().idxmin()
+
+def category_by_percentage(df):
+    total = abs(df["amount"].sum())
+
+    return (abs(spending_by_category(df)) / total ) * 100
+
+def detect_overspending(df):
+    percentages = category_by_percentage(df)
+
+    return percentages[percentages > 30]
+
+def date_range(df, start_date, end_date):
+   return df[[date] >= start_date] & df[[date] <= end_date]
 
 def process_data(path):
     df = load_data(path)
@@ -95,6 +114,9 @@ def process_data(path):
     return df
 
 if __name__ == "__main__":
+   from report import generate_report
+   from llm_insights import generate_ai_insight
+   from agent import run_agent
    df = process_data("/Users/timur/Downloads/Expenses_clean.csv")
 
    total = total_spent(df)

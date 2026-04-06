@@ -5,25 +5,36 @@ async function uploadFile() {
     const formData = new FormData();
     formData.append("file", file);
 
-    const responce = await fetch("http://127.0.0.1:8000/analyze", {
+    const response = await fetch("http://127.0.0.1:8000/analyze", {
         method: "POST",
         body: formData
     });
-    const data = await responce.json();
+    const data = await response.json();
 
-    const report = document.getElementById("reportOutput"); 
+    const report = document.getElementById("reportOutput");
 
+    const values = Object.values(data.categories).map(v => Math.abs(v));
+    const maxValue = Math.max(...values);
+ 
     report.innerHTML = `
-        <p><strong>Total spent:</strong> $${Math.abs(data.total).toFixed(2)}</p>
-
+        <p><strong>Total spent:</strong> $${(data.total_display)}</p>
         <h3>Categories</h3>
-        <ul>
+        <div class="chart">
             ${Object.entries(data.categories)
-                .map(([key, value]) =>
-                    `<li>${key}: $${Math.abs(value).toFixed(2)}</li>`
-                )
+                .map(([category, amount]) => {
+                    const abs = Math.abs(amount);
+                    const pct = (abs / maxValue * 100).toFixed(1);
+                    return `
+                        <div class="chart-row">
+                            <span class="chart-label">${category}</span>
+                            <div class="chart-bar-wrap">
+                                <div class="chart-bar" style="width: ${pct}%"></div>
+                                <span class="chart-value">$${abs.toFixed(2)}</span>
+                            </div>
+                        </div>`;
+                })
                 .join("")}
-        </ul>
+        </div>
     `;
 }
 

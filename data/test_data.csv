@@ -1,0 +1,117 @@
+date,description,amount
+2026-01-01,Opening balance adjustment,150.00
+2026-01-02,Salary January,2800.00
+2026-01-02,ATM withdrawal,-100.00
+2026-01-03,Rent January,-950.00
+2026-01-03,Carrefour groceries,-86.45
+2026-01-04,Metro ticket,-2.10
+2026-01-04,Coffee shop,-3.50
+2026-01-05,Electricity bill,-72.30
+2026-01-05,Bakery,-4.80
+2026-01-06,Amazon purchase,-45.99
+2026-01-06,Refund Amazon,15.99
+2026-01-07,Pharmacy,-12.80
+2026-01-07,Snack vending machine,-2.20
+2026-01-08,Restaurant dinner,-28.60
+2026-01-08,Tip restaurant,-4.00
+2026-01-09,Spotify subscription,-9.99
+2026-01-09,Transfer to savings,-200.00
+2026-01-10,Gas station,-60.00
+2026-01-10,Coffee shop,-3.20
+2026-01-11,Supermarket Lidl,-34.10
+2026-01-11,Beer shop,-12.50
+2026-01-12,Freelance payment,450.00
+2026-01-12,Online course,-25.00
+2026-01-13,Bakery,-6.20
+2026-01-13,Taxi ride,-14.00
+2026-01-14,Clothing store,-120.00
+2026-01-14,Clothing return,30.00
+2026-01-15,Internet bill,-35.00
+2026-01-15,Cafe lunch,-11.50
+2026-01-16,Supermarket Aldi,-54.30
+2026-01-16,Ice cream,-3.00
+2026-01-17,Parking fee,-5.00
+2026-01-17,Cinema,-11.50
+2026-01-18,Water bill,-25.75
+2026-01-18,Snack bar,-6.80
+2026-01-19,Gym membership,-40.00
+2026-01-19,Protein shake,-4.50
+2026-01-20,Train ticket,-22.00
+2026-01-20,Coffee shop,-3.60
+2026-01-21,Supermarket Tesco,-41.20
+2026-01-21,Household supplies,-18.90
+2026-01-22,Uber ride,-14.00
+2026-01-22,Tip driver,-2.00
+2026-01-23,Bookstore,-19.99
+2026-01-23,Kindle ebook,-7.99
+2026-01-24,Restaurant dinner,-32.00
+2026-01-24,Shared bill reimbursement,16.00
+2026-01-25,Mobile phone bill,-20.00
+2026-01-25,App store purchase,-2.99
+2026-01-26,Supermarket Lidl,-38.75
+2026-01-26,Bakery,-5.20
+2026-01-27,Taxi ride,-18.00
+2026-01-27,Snack vending machine,-2.50
+2026-01-28,Water bill adjustment,5.00
+2026-01-28,Online shopping,-65.00
+2026-01-29,Gift purchase,-40.00
+2026-01-29,Gift refund,10.00
+2026-01-30,Gym membership,-40.00
+2026-01-30,Protein bar,-3.20
+2026-01-31,Interest income,3.50
+2026-02-01,Salary February,2800.00
+2026-02-01,ATM withdrawal,-120.00
+2026-02-02,Rent February,-950.00
+2026-02-02,Supermarket Aldi,-78.20
+2026-02-03,Bus ticket,-2.50
+2026-02-03,Cafe brunch,-15.40
+2026-02-04,Electricity bill,-68.10
+2026-02-04,Bakery,-5.00
+2026-02-05,Online shopping Zalando,-89.90
+2026-02-05,Refund Zalando,25.00
+2026-02-06,Pharmacy,-18.25
+2026-02-06,Snack vending machine,-2.80
+2026-02-07,Takeaway food,-22.00
+2026-02-07,Tip delivery,-3.00
+2026-02-08,Netflix subscription,-13.99
+2026-02-08,Transfer to savings,-250.00
+2026-02-09,Gas refill,-55.00
+2026-02-09,Coffee shop,-3.40
+2026-02-10,Supermarket Lidl,-36.60
+2026-02-10,Beer shop,-14.20
+2026-02-11,Valentine gift,-45.00
+2026-02-11,Flower shop,-20.00
+2026-02-12,Valentine dinner,-65.00
+2026-02-12,Tip restaurant,-8.00
+2026-02-13,Freelance payment,520.00
+2026-02-13,Online course,-30.00
+2026-02-14,Bakery,-5.80
+2026-02-14,Taxi ride,-16.00
+2026-02-15,Electronics store,-210.00
+2026-02-15,Electronics refund,50.00
+2026-02-16,Internet bill,-35.00
+2026-02-16,Cafe lunch,-12.00
+2026-02-17,Supermarket Tesco,-61.70
+2026-02-17,Household supplies,-22.40
+2026-02-18,Uber ride,-18.50
+2026-02-18,Tip driver,-2.50
+2026-02-19,Concert ticket,-45.00
+2026-02-19,Beer at concert,-9.00
+2026-02-20,Water bill,-27.10
+2026-02-20,Snack bar,-7.50
+2026-02-21,Gym membership,-40.00
+2026-02-21,Protein shake,-4.80
+2026-02-22,Train ticket,-25.00
+2026-02-22,Coffee shop,-3.70
+2026-02-23,Supermarket Aldi,-44.10
+2026-02-23,Bakery,-6.00
+2026-02-24,Taxi ride,-20.00
+2026-02-24,Snack vending machine,-3.00
+2026-02-25,Bookstore,-21.50
+2026-02-25,Kindle ebook,-8.99
+2026-02-26,Restaurant dinner,-34.00
+2026-02-26,Shared bill reimbursement,17.00
+2026-02-27,Mobile phone bill,-20.00
+2026-02-27,App store purchase,-3.49
+2026-02-28,Gym membership,-40.00
+2026-02-28,Interest income,3.80

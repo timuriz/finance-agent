@@ -1,4 +1,4 @@
-from analytics import top_category, detect_overspending
+from data_processing import top_category, detect_overspending, category_by_percentage
 
 
 def generate_report(df, anomalies):
