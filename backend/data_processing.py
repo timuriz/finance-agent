@@ -1,6 +1,11 @@
 import pandas as pd
+import re
 from categorization import categorize_transaction
 from anomaly_detection import detect_anomalies
+
+
+
+
 
 def load_data(path):
     df = pd.read_csv(path, sep=None, engine="python")
@@ -20,9 +25,16 @@ def detect_amount_pattern(df):
    else:
       return "unsigned"
 
+def parse_amount(value):
+   if isinstance(value, str):
+      cleaned = value.strip().replace(",", ".").replace(" ", "")
+      cleaned = re.sub(r"[^\d.\-]", "", cleaned)
+      return float(cleaned)
+   return float(value)
+
 def clean_data(df):
    df["date"] = pd.to_datetime(df["date"], format="mixed", dayfirst=True, errors="coerce")
-   df["amount"] = df["amount"].astype(float)
+   df["amount"] = df["amount"].astype(parse_amount)
    
    pattern = detect_amount_pattern(df)
    
@@ -38,7 +50,9 @@ def clean_data(df):
 
 column_map = {"date": ["date", "date_time", "transaction_date", "time", "when"],
               "description": ["description", "details", "about", "category"],
-               "amount": ["amount", "value", "sum"] }
+               "amount": ["amount", "value", "sum"]
+               "currency": ["currency", "ccy", "curr"] }
+               
 
 def map_columns(df):
    df.columns = df.columns.str.lower().str.strip().str.replace(" ", "_")
@@ -93,6 +107,8 @@ def detect_overspending(df):
 
 def date_range(df, start_date, end_date):
    return df[[date] >= start_date] & df[[date] <= end_date]
+
+
 
 def process_data(path):
     df = load_data(path)
