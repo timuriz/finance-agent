@@ -1,0 +1,70 @@
+# ── Python ────────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+.Python
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+.env/
+
+# ── Environment & secrets ─────────────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+*.key
+secrets.json
+credentials.json
+
+# ── ML models ─────────────────────────────────────────────────────────────────
+models/*.pkl
+models/*.joblib
+models/*.h5
+models/*.pt
+models/*.pth
+
+# ── Data files ────────────────────────────────────────────────────────────────
+data/*.csv
+data/*.json
+data/*.parquet
+data/*.db
+data/*.sqlite
+
+# ── Jupyter ───────────────────────────────────────────────────────────────────
+.ipynb_checkpoints/
+*.ipynb
+
+# ── macOS ─────────────────────────────────────────────────────────────────────
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# ── IDEs & editors ────────────────────────────────────────────────────────────
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# ── Logs & reports ────────────────────────────────────────────────────────────
+*.log
+logs/
+reports/*.pdf
+reports/*.html
+
+# ── Node (frontend) ───────────────────────────────────────────────────────────
+node_modules/
+npm-debug.log*
+yarn-error.log
+.npm
