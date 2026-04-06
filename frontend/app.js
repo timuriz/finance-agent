@@ -2,6 +2,12 @@ async function uploadFile() {
     const fileInput = document.getElementById("fileInput");
     const file = fileInput.files[0];
 
+    <select id="currencySelect">
+        <option value="USD">USD</option>
+        <option value="EUR">EUR</option>
+        <option value="GBP">GBP</option>
+    </select>
+        
     const formData = new FormData();
     formData.append("file", file);
 
