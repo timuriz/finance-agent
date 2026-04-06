@@ -1,5 +1,6 @@
 import pandas as pd
 import re
+import request
 from categorization import categorize_transaction
 from anomaly_detection import detect_anomalies
 
@@ -48,11 +49,36 @@ def clean_data(df):
 
    return df
 
+def get_exchange_rates(base="USD")
+   response = request.get(f"https://api.frankfurter.app/latest?base={base}")
+   return response.json()["rates"]
+
+def convert_to_base(df, base_currency="USD"):
+   if "currency" not in df.columns:
+      return df
+
+   rates = get_exchange_rates(base_currency)
+
+   def convert(row):
+      ccy = row["currency"].upper().strip()
+      if ccy == base_currency:
+         return row["amount"]
+      rate = rates.get(ccy)
+      if rate is None:
+         return row["amount"]
+      return row["amount"] / rate
+
+   df["amount"] = df.apply(convert, axis=1)
+   df["currency"] = base_currency
+   return df
+   
+
+
 column_map = {"date": ["date", "date_time", "transaction_date", "time", "when"],
               "description": ["description", "details", "about", "category"],
                "amount": ["amount", "value", "sum"]
                "currency": ["currency", "ccy", "curr"] }
-               
+
 
 def map_columns(df):
    df.columns = df.columns.str.lower().str.strip().str.replace(" ", "_")
