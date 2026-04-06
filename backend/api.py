@@ -20,10 +20,11 @@ GLOBAL_DF = None
 
 
 @app.post("/analyze")
-async def analyze(file: UploadFile):
+async def analyze(file: UploadFile, currency = "USD"):
     contents = await file.read()
 
     df = process_data(io.StringIO(contents.decode()))
+    df = convert_to_base(df, base_currency=currency)
 
     global GLOBAL_DF
     GLOBAL_DF = df
