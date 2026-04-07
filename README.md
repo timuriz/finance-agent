@@ -7,10 +7,10 @@ A personal finance analysis tool that lets you upload a bank transaction CSV, au
 ## Screenshots
 
 ### Spending by Category
-![Spending by category – bar chart](docs/screenshot-categories.png)
+(<img width="848" height="743" alt="screenshot-categories" src="https://github.com/user-attachments/assets/fdfaa1c8-b667-4d3d-8875-0f23451fb402" />)
 
 ### AI Chat
-![AI finance assistant chat](docs/screenshot-chat.png)
+(<img width="853" height="726" alt="screenshot-chat" src="https://github.com/user-attachments/assets/3c6c8987-b8e4-45f9-b581-66429f97209e"/>)
 
 ---
 
@@ -117,14 +117,3 @@ Open `frontend/index.html` directly in your browser, or serve it with any static
 5. Ask a question in the **chat panel** — the agent picks the right tool (`get_summary`, `get_category_breakdown`, `get_anomalies`, `get_overspending`, or `get_date_range`), runs it against your data, then passes the result to Gemini to generate a clear, concise answer.
 
 ---
-
-## Adding Your Screenshots
-
-Drop your screenshots into the `docs/` folder:
-
-```
-docs/screenshot-categories.png   ← spending bar chart
-docs/screenshot-chat.png         ← AI chat panel
-```
-
-They will appear automatically at the top of this README.
