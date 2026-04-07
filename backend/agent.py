@@ -8,8 +8,8 @@ from data_processing import (
 from anomaly_detection import detect_anomalies
 import json
 import google.generativeai as genai
-import os
 from datetime import date
+from config import GOOGLE_API_KEY
 import pandas as pd
 
 # ------------------------
@@ -133,7 +133,7 @@ Be concise.
 # LLM SETUP
 # ------------------------
 
-genai.configure(api_key=os.environ["GOOGLE_API_KEY"])
+genai.configure(api_key=GOOGLE_API_KEY)
 model = genai.GenerativeModel("gemini-3-flash-preview")
 
 
