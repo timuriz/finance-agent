@@ -56,29 +56,37 @@ def clean_data(df):
    return df
 
 def get_exchange_rates(base="USD"):
-    response = requests.get(f"https://api.frankfurter.dev/v1/latest?base={base}")
-    return response.json()["rates"]
+    url = f"https://open.er-api.com/v6/latest/{base}"
+    try:
+        response = requests.get(url, timeout=5)
+        response.raise_for_status()
+        data = response.json()
+        if data.get("result") != "success":
+            raise ValueError(f"Exchange rate API error: {data}")
+        return data["rates"]
+    except requests.exceptions.RequestException as e:
+        raise ValueError(f"Could not fetch exchange rates: {e}")
 
 def convert_to_base(df, base_currency="USD"):
-   if "currency" not in df.columns:
-      return df
+    if "currency" not in df.columns:
+        return df
 
-   rates = get_exchange_rates(base_currency)
+    rates = get_exchange_rates(base_currency)
+    def convert(row):
+        ccy = row["currency"]
+        if not isinstance(ccy, str) or not ccy.strip():
+            return row["amount"]
+        ccy = ccy.upper().strip()
+        if ccy == base_currency:
+            return row["amount"]
+        rate = rates.get(ccy)
+        if rate is None:
+            return row["amount"]
+        return row["amount"] / rate
 
-   def convert(row):
-      ccy = row["currency"].upper().strip()
-      if ccy == base_currency:
-         return row["amount"]
-      rate = rates.get(ccy)
-      if rate is None:
-         return row["amount"]
-      return row["amount"] / rate
-
-   df["amount"] = df.apply(convert, axis=1)
-   df["currency"] = base_currency
-   return df
-
-
+    df["amount"] = df.apply(convert, axis=1)   # ← this line is missing
+    df["currency"] = base_currency
+    return df                                   # ← and this one
 
 column_map = {
     "date":        ["date", "date_time", "transaction_date", "time", "when"],

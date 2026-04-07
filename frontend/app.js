@@ -11,6 +11,7 @@ async function uploadFile() {
         body: formData
     });
     const data = await response.json();
+    const currency = document.getElementById("currencySelect").value;
 
     const report = document.getElementById("reportOutput");
 
@@ -18,7 +19,7 @@ async function uploadFile() {
     const maxValue = Math.max(...values);
  
     report.innerHTML = `
-        <p><strong>Total spent:</strong> ${data.total_display} ${data.currency}</p>
+        <p><strong>Total spent:</strong> ${data.total_display} ${currency}</p>
         <h3>Categories</h3>
         <div class="chart">
             ${Object.entries(data.categories)
@@ -30,7 +31,7 @@ async function uploadFile() {
                             <span class="chart-label">${category}</span>
                             <div class="chart-bar-wrap">
                                 <div class="chart-bar" style="width: ${pct}%"></div>
-                                <span class="chart-value">${abs.toFixed(2)} ${data.currency}</span>
+                                <span class="chart-value">${abs.toFixed(2)} ${currency}</span>
                             </div>
                         </div>`;
                 })

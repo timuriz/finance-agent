@@ -22,7 +22,6 @@ def categorize_transaction(description):
         X = vectorizer.transform([description])
     
         probs = model.predict_proba(X)[0]
-        print(probs)
         max_prob = max(probs)
         
         if max_prob > 0.4:
