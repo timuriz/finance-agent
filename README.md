@@ -117,14 +117,3 @@ Open `frontend/index.html` directly in your browser, or serve it with any static
 5. Ask a question in the **chat panel** — the agent picks the right tool (`get_summary`, `get_category_breakdown`, `get_anomalies`, `get_overspending`, or `get_date_range`), runs it against your data, then passes the result to Gemini to generate a clear, concise answer.
 
 ---
-
-## Adding Your Screenshots
-
-Drop your screenshots into the `docs/` folder:
-
-```
-docs/screenshot-categories.png   ← spending bar chart
-docs/screenshot-chat.png         ← AI chat panel
-```
-
-They will appear automatically at the top of this README.
