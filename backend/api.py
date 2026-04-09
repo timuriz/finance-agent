@@ -21,11 +21,6 @@ CHAT_HISTORY = []
 @app.post("/analyze")
 async def analyze(file: UploadFile, currency = Form(default="USD")):
     contents = await file.read()
-
-    global GLOBAL_DF, CHAT_HISTORY
-    GLOBAL_DF = df
-    CHAT_HISTORY = []
-
     
     try:
         df = process_data(io.StringIO(contents.decode()))
@@ -34,8 +29,9 @@ async def analyze(file: UploadFile, currency = Form(default="USD")):
         raise HTTPException(status_code=400, detail=str(e))
 
 
-    global GLOBAL_DF
+    global GLOBAL_DF, CHAT_HISTORY
     GLOBAL_DF = df
+    CHAT_HISTORY = []
 
 
     total = total_spent(df)
@@ -54,13 +50,6 @@ async def chat(request: dict):
     if GLOBAL_DF is None:
         return {"response": "Please upload your CSV first before asking question"}
 
-    result = run_agent(message, GLOBAL_DF, hisory=CHAT_HISTORY)
-
-    CHAT_HISTORY.append({
-        "user": message,
-        "assistant": result["answer"]
-    })
-    if len(CHAT_HISTORY) > 5:
-        CHAT_HISTORY.pop(0)
+    result = run_agent(message, GLOBAL_DF, history=CHAT_HISTORY)
 
     return {"response": result["answer"]}

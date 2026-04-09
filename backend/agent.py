@@ -6,7 +6,7 @@ from data_processing import (
 )
 from anomaly_detection import detect_anomalies
 import json
-import google as genai
+from google import genai
 from datetime import date
 from config import GOOGLE_API_KEY
 import pandas as pd
@@ -19,7 +19,7 @@ import pandas as pd
 
 
 client = genai.Client(api_key=GOOGLE_API_KEY)
-model = "gemini-3-flash"
+MODEL = "gemini-2.5-flash"
 
 
 # ------------------------
@@ -31,6 +31,7 @@ TOOLS = {
     "get_category_breakdown": "Returns spending per category",
     "get_anomalies": "Returns unusual transactions",
     "get_overspending": "Returns categories with high spending",
+    "none": "Answer from conversation history",
 }
 
 
@@ -80,18 +81,21 @@ def execute_tool(tool_name, df):
 # PROMPTS
 # ------------------------
 
-def build_decision_prompt(user_query):
+def build_decision_prompt(user_query, last_result=None):
     today = date.today().isoformat()
+    last_result_text = f"\nLast computed result: {last_result}" if last_result else ""
     return f"""
 You are a financial assistant agent. Today is {today}
+{last_result_text}
 
-You MUST choose ONE tool, and extract any date from user message.
+You MUST choose ONE tool,OR if the question can be answered from the last result above, use "none". and extract any date from user message.
 
 TOOLS:
 - get_summary
 - get_category_breakdown
 - get_anomalies
 - get_overspending
+- none  (use when answering a follow-up from previous context)
 
 USER QUESTION:
 {user_query}
@@ -107,11 +111,11 @@ Respond only with valid JSON, no markdown, no explanation:\n like:
 
 def build_explanation_prompt(user_query, tool_result, history):
 
-    hisory_text = ""
+    history_text = ""
     if history:
-        hisory_text = "\n\nPrevious conversation:\n"
+        history_text = "\n\nPrevious conversation:\n"
         for turn in history:
-            hisory_text += f"User: {turn['user']}\nAssistant: {turn['assistant']}\n"
+            history_text += f"User: {turn['user']}\nAssistant: {turn['assistant']}\n"
 
 
     return f"""
@@ -144,11 +148,12 @@ Be concise.
 # MAIN AGENT FUNCTION
 # ------------------------
 
-def run_agent(user_query, df):
+def run_agent(user_query, df, history=None):
     if history is None:
         history = []
 
-    prompt = build_decision_prompt(user_query)
+    last_result = history[-1].get("result") if history else None
+    prompt = build_decision_prompt(user_query, last_result)
     response = client.models.generate_content(model=MODEL, contents=prompt)
     
     # Parse JSON from LLM
@@ -163,21 +168,31 @@ def run_agent(user_query, df):
     
     if tool not in TOOLS:
         return {"answer": "I couldn't determine the correct tool to use."}
-    
-    filtered_df = df.copy()
-    if start_date:
-        filtered_df = filtered_df[filtered_df["date"] >= pd.Timestamp(start_date)]
-    if end_date:
-        filtered_df = filtered_df[filtered_df["date"] <= pd.Timestamp(end_date)]
 
-    if filtered_df.empty:
-        date_range_str = f"{start_date} to {end_date}" if start_date else "that period"
-        return {"answer": f"No transaction found for {date_range_str}."}
-    
-    
-    tool_result = execute_tool(tool, filtered_df)
+    if tool == "none":
+        tool_result = last_result or "No previous data available."
+    else:
+        filtered_df = df.copy()
+        if start_date:
+            filtered_df = filtered_df[filtered_df["date"] >= pd.Timestamp(start_date)]
+        if end_date:
+            filtered_df = filtered_df[filtered_df["date"] <= pd.Timestamp(end_date)]
+
+        if filtered_df.empty:
+            date_range_str = f"{start_date} to {end_date}" if start_date else "that period"
+            return {"answer": f"No transaction found for {date_range_str}."}
+        tool_result = execute_tool(tool, filtered_df)
     
     explanation_prompt = build_explanation_prompt(user_query, tool_result, history)
     explanation_response = client.models.generate_content(model=MODEL, contents=explanation_prompt)
+    answer = explanation_response.text
+
+    history.append({
+        "user": user_query,
+        "assistant": answer,
+        "result": tool_result
+    })
+    if len(history) > 5:
+        history.pop(0)
     
     return {"decision": decision, "answer": explanation_response.text}
