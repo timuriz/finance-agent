@@ -10,6 +10,16 @@ async function uploadFile() {
         method: "POST",
         body: formData
     });
+
+
+    if (!response.ok) {
+        const error = await response.json();
+        report.innerHTML = `<p style="color:red";>Error ${error.detail}</p>`;
+        return;
+    }
+
+
+
     const data = await response.json();
     const currency = document.getElementById("currencySelect").value;
 
