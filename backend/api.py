@@ -1,8 +1,6 @@
-from fastapi import FastAPI, UploadFile, Form
+from fastapi import FastAPI, UploadFile, Form, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-
 import io
-
 from data_processing import process_data, total_spent, spending_by_category, convert_to_base
 from agent import run_agent
 
@@ -23,8 +21,13 @@ GLOBAL_DF = None
 async def analyze(file: UploadFile, currency = Form(default="USD")):
     contents = await file.read()
 
-    df = process_data(io.StringIO(contents.decode()))
-    df = convert_to_base(df, base_currency=currency)
+    
+    try:
+        df = process_data(io.StringIO(contents.decode()))
+        df = convert_to_base(df, base_currency=currency)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
 
     global GLOBAL_DF
     GLOBAL_DF = df
