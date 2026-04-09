@@ -1,7 +1,14 @@
 async function uploadFile() {
     const fileInput = document.getElementById("fileInput");
     const file = fileInput.files[0];
-        
+    const btn = document.querySelector(".card button");
+
+    
+    btn.disabled = true;
+    btn.textContent - "Processing...";
+    const report = document.getElementById("reportOutput");
+    report.innerHTML = `<p>Analysing your transactions...</p>`;
+
     const formData = new FormData();
     formData.append("file", file);
     formData.append("currency", document.getElementById("currencySelect").value);
@@ -23,7 +30,7 @@ async function uploadFile() {
     const data = await response.json();
     const currency = document.getElementById("currencySelect").value;
 
-    const report = document.getElementById("reportOutput");
+    
 
     const values = Object.values(data.categories).map(v => Math.abs(v));
     const maxValue = Math.max(...values);
@@ -48,6 +55,8 @@ async function uploadFile() {
                 .join("")}
         </div>
     `;
+    btn.disabled = false;
+    btn.textContent ="Upload CSV";
 }
 
 async function sendMessage() {
