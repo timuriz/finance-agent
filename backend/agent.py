@@ -6,10 +6,21 @@ from data_processing import (
 )
 from anomaly_detection import detect_anomalies
 import json
-import google.generativeai as genai
+import google as genai
 from datetime import date
 from config import GOOGLE_API_KEY
 import pandas as pd
+
+
+
+#-------------------------
+# MODEL SETUP
+#-------------------------
+
+
+client = genai.Client(api_key=GOOGLE_API_KEY)
+model = "gemini-3-flash"
+
 
 # ------------------------
 # TOOL DEFINITIONS
@@ -94,7 +105,15 @@ Respond only with valid JSON, no markdown, no explanation:\n like:
 }}
 """
 
-def build_explanation_prompt(user_query, tool_result):
+def build_explanation_prompt(user_query, tool_result, history):
+
+    hisory_text = ""
+    if history:
+        hisory_text = "\n\nPrevious conversation:\n"
+        for turn in history:
+            hisory_text += f"User: {turn['user']}\nAssistant: {turn['assistant']}\n"
+
+
     return f"""
 You are a financial assistant.
 
@@ -118,8 +137,7 @@ Be concise.
 # LLM SETUP
 # ------------------------
 
-genai.configure(api_key=GOOGLE_API_KEY)
-model = genai.GenerativeModel("gemini-3-flash-preview")
+
 
 
 # ------------------------
@@ -127,8 +145,11 @@ model = genai.GenerativeModel("gemini-3-flash-preview")
 # ------------------------
 
 def run_agent(user_query, df):
+    if history is None:
+        history = []
+
     prompt = build_decision_prompt(user_query)
-    response = model.generate_content(prompt)
+    response = client.models.generate_content(model=MODEL, contents=prompt)
     
     # Parse JSON from LLM
     try:
@@ -156,7 +177,7 @@ def run_agent(user_query, df):
     
     tool_result = execute_tool(tool, filtered_df)
     
-    explanation_prompt = build_explanation_prompt(user_query, tool_result)
-    explanation_response = model.generate_content(explanation_prompt)
+    explanation_prompt = build_explanation_prompt(user_query, tool_result, history)
+    explanation_response = client.models.generate_content(model=MODEL, contents=explanation_prompt)
     
     return {"decision": decision, "answer": explanation_response.text}
