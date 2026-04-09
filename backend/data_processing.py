@@ -6,26 +6,25 @@ from anomaly_detection import detect_anomalies
 from config import TEST1_DATA_PATH
 
 
-
-
-
 def load_data(path):
     df = pd.read_csv(path, sep=None, engine="python")
     return df
 
 def handle_missing_values(df):
-   df = df.dropna(subset=["date", "description", "amount"])
-   return df
+    df = df.dropna(subset=["date", "description", "amount"])
+    if "currency" in df.columns:
+        df["currency"] = df["currency"].fillna("USD")
+    return df
 
 def remove_duplicates(df):
-   df = df.drop_duplicates()
-   return df
+    df = df.drop_duplicates()
+    return df
 
 def detect_amount_pattern(df):
-   if (df["amount"] < 0).any():
-      return "signed"
-   else:
-      return "unsigned"
+    if (df["amount"] < 0).any():
+        return "signed"
+    else:
+        return "unsigned"
 
 def parse_amount(value):
     if isinstance(value, str):
@@ -38,23 +37,20 @@ def parse_amount(value):
         return float(value)
     except (TypeError, ValueError):
         return 0.0
-      
-   
-def clean_data(df):
-   df["date"] = pd.to_datetime(df["date"], format="mixed", dayfirst=True, errors="coerce")
-   df["amount"] = df["amount"].apply(parse_amount)
-   
-   pattern = detect_amount_pattern(df)
-   
-   if pattern == "signed":
-      df["type"] = df["amount"].apply(lambda x: "debit" if x < 0 else "credit")
-   
-   elif pattern == "unsigned":
-    
-      df["amount"] = -df["amount"]
-      df["type"] = "debit"
 
-   return df
+def clean_data(df):
+    df["date"] = pd.to_datetime(df["date"], format="mixed", dayfirst=True, errors="coerce")
+    df["amount"] = df["amount"].apply(parse_amount)
+
+    pattern = detect_amount_pattern(df)
+
+    if pattern == "signed":
+        df["type"] = df["amount"].apply(lambda x: "debit" if x < 0 else "credit")
+    elif pattern == "unsigned":
+        df["amount"] = -df["amount"]
+        df["type"] = "debit"
+
+    return df
 
 def get_exchange_rates(base="USD"):
     url = f"https://open.er-api.com/v6/latest/{base}"
@@ -73,6 +69,7 @@ def convert_to_base(df, base_currency="USD"):
         return df
 
     rates = get_exchange_rates(base_currency)
+
     def convert(row):
         ccy = row["currency"]
         if not isinstance(ccy, str) or not ccy.strip():
@@ -96,18 +93,17 @@ column_map = {
     "currency":    ["operation_currency", "currency", "ccy", "curr"],
 }
 
-
 def map_columns(df):
     df.columns = df.columns.str.lower().str.strip().str.replace(" ", "_")
     mapping = {}
 
     for standard_col, possible_names in column_map.items():
         for col in df.columns:
-            if col in mapping:        # already mapped to something else, skip
+            if col in mapping:
                 continue
             if any(name in col for name in possible_names):
                 mapping[col] = standard_col
-                break                 # stop after first match per standard column
+                break
 
     df = df.rename(columns=mapping)
     return df
@@ -115,21 +111,19 @@ def map_columns(df):
 REQUIRED = ["date", "description", "amount"]
 
 def validate_columns(df):
-   for col in REQUIRED:
-      if col not in df.columns:
-         raise ValueError(f"Missing required column: {col}")
+    for col in REQUIRED:
+        if col not in df.columns:
+            raise ValueError(f"Missing required column: {col}")
 
 def normalize_amount(df):
-   if "amount" in df.columns:
-      return df
-   
-   elif "debit" in df.columns and "credit" in df.columns:
-      df["amount"] = df["credit"] - df["debit"]
-      return df
-   
-   else:
-      raise ValueError("No valid amount column found")
-   
+    if "amount" in df.columns:
+        return df
+    elif "debit" in df.columns and "credit" in df.columns:
+        df["amount"] = df["credit"] - df["debit"]
+        return df
+    else:
+        raise ValueError("No valid amount column found")
+
 def total_spent(df):
     return df["amount"].sum()
 
@@ -137,33 +131,24 @@ def spending_by_category(df):
     return df.groupby("category")["amount"].sum().sort_values()
 
 def top_category(df):
+    if df.empty:
+        return "No data"
     return df.groupby("category")["amount"].sum().idxmin()
 
 def category_by_percentage(df):
     total = abs(df["amount"].sum())
-
-    return (abs(spending_by_category(df)) / total ) * 100
+    return (abs(spending_by_category(df)) / total) * 100
 
 def detect_overspending(df):
     percentages = category_by_percentage(df)
-
     return percentages[percentages > 30]
-
-def date_range(df, start_date, end_date):
-   return df[(df["date"] >= start_date) & (df["date"] <= end_date)]
-
-
 
 def process_data(path):
     df = load_data(path)
-
     df = map_columns(df)
-    #print("Columns after mapping:", df.columns.tolist())
     validate_columns(df)
-
     df = handle_missing_values(df)
     df = remove_duplicates(df)
-
     df = normalize_amount(df)
     df = clean_data(df)
 
@@ -173,20 +158,18 @@ def process_data(path):
     df = df[cols]
 
     df["category"] = df["description"].apply(categorize_transaction)
-
     return df
 
 if __name__ == "__main__":
-   from report import generate_report
-   from llm_insights import generate_ai_insight
-   from agent import run_agent
-   df = process_data(TEST1_DATA_PATH)
+    from report import generate_report
+    from llm_insights import generate_ai_insight
+    from agent import run_agent
+    df = process_data(TEST1_DATA_PATH)
 
-   total = total_spent(df)
-   category_spending = spending_by_category(df)
-   top_cat = top_category(df)
-   anomalies = detect_anomalies(df)
+    total = total_spent(df)
+    category_spending = spending_by_category(df)
+    top_cat = top_category(df)
+    anomalies = detect_anomalies(df)
 
-   report = generate_report(df, anomalies)
-
-   print(report)
+    report = generate_report(df, anomalies)
+    print(report)
