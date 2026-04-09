@@ -2,8 +2,7 @@ from data_processing import (
     total_spent,
     top_category,
     spending_by_category,
-    detect_overspending,
-    date_range
+    detect_overspending
 )
 from anomaly_detection import detect_anomalies
 import json
@@ -86,7 +85,7 @@ TOOLS:
 USER QUESTION:
 {user_query}
 
-Respond obly with valid JSON, no markdown, no explanation:\n like:
+Respond only with valid JSON, no markdown, no explanation:\n like:
 {{
   "tool": "<tool_name>",
   "start_date": "<YYYY-MM-DD or null>",
