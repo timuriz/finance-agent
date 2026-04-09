@@ -15,11 +15,16 @@ app.add_middleware(
 )
 
 GLOBAL_DF = None
+CHAT_HISTORY = []
 
 
 @app.post("/analyze")
 async def analyze(file: UploadFile, currency = Form(default="USD")):
     contents = await file.read()
+
+    global GLOBAL_DF, CHAT_HISTORY
+    GLOBAL_DF = df
+    CHAT_HISTORY = []
 
     
     try:
@@ -49,6 +54,13 @@ async def chat(request: dict):
     if GLOBAL_DF is None:
         return {"response": "Please upload your CSV first before asking question"}
 
-    result = run_agent(message, GLOBAL_DF)
+    result = run_agent(message, GLOBAL_DF, hisory=CHAT_HISTORY)
+
+    CHAT_HISTORY.append({
+        "user": message,
+        "assistant": result["answer"]
+    })
+    if len(CHAT_HISTORY) > 5:
+        CHAT_HISTORY.pop(0)
 
     return {"response": result["answer"]}
