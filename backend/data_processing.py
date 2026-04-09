@@ -190,15 +190,3 @@ if __name__ == "__main__":
    report = generate_report(df, anomalies)
 
    print(report)
-
-   #ai_text = generate_ai_insight(total, category_spending, anomalies)
-
-   #print("\n--- AI INSIGHTS ---")
-   #print(ai_text)
-   #result = run_agent("How much i spent last week? And what i should to to spend less money", df.head())
-
-   #print("\n--- DECISION ---")
-   #print(result["decision"])
-
-   #print("\n--- FINAL ANSWER ---")
-   #print(result["answer"])
