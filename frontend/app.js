@@ -1,7 +1,7 @@
 async function uploadFile() {
     const fileInput = document.getElementById("fileInput");
     const file = fileInput.files[0];
-    const btn = document.querySelector(".card button");
+    const btn = document.getElementById("uploadBtn");
 
     
     btn.disabled = true;
