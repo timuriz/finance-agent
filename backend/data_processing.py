@@ -3,6 +3,7 @@ import re
 import requests
 from categorization import categorize_transaction
 from anomaly_detection import detect_anomalies
+from config import TEST1_DATA_PATH
 
 
 
@@ -84,9 +85,9 @@ def convert_to_base(df, base_currency="USD"):
             return row["amount"]
         return row["amount"] / rate
 
-    df["amount"] = df.apply(convert, axis=1)   # ← this line is missing
+    df["amount"] = df.apply(convert, axis=1)
     df["currency"] = base_currency
-    return df                                   # ← and this one
+    return df
 
 column_map = {
     "date":        ["date", "date_time", "transaction_date", "time", "when"],
@@ -149,7 +150,7 @@ def detect_overspending(df):
     return percentages[percentages > 30]
 
 def date_range(df, start_date, end_date):
-   return df[["date"] >= start_date] & df[["date"] <= end_date]
+   return df[(df["date"] >= start_date) & (df["date"] <= end_date)]
 
 
 
@@ -157,7 +158,7 @@ def process_data(path):
     df = load_data(path)
 
     df = map_columns(df)
-    print("Columns after mapping:", df.columns.tolist())
+    #print("Columns after mapping:", df.columns.tolist())
     validate_columns(df)
 
     df = handle_missing_values(df)
@@ -179,7 +180,7 @@ if __name__ == "__main__":
    from report import generate_report
    from llm_insights import generate_ai_insight
    from agent import run_agent
-   df = process_data("/Users/timur/Downloads/Expenses_clean.csv")
+   df = process_data(TEST1_DATA_PATH)
 
    total = total_spent(df)
    category_spending = spending_by_category(df)

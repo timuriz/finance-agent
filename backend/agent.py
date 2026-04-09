@@ -45,9 +45,6 @@ def get_anomalies_tool(df):
 def get_overspending_tool(df):
     return detect_overspending(df).to_dict()
 
-def get_date_range(df, sd, ed):
-    return date_range(df, sd, ed).to_dict()
-
 
 # ------------------------
 # TOOL EXECUTION
@@ -69,19 +66,6 @@ def execute_tool(tool_name, df):
     else:
         return {"error": "Unknown tool"}
 
-
-# ------------------------
-# TOOL EXTRACTION
-# ------------------------
-
-def extract_tool(response_text):
-    for line in response_text.split("\n"):
-        if "Tool:" in line:
-            print(line.split("Tool:")[1].strip())
-            return line.split("Tool:")[1].strip()
-    return None
-
-
 # ------------------------
 # PROMPTS
 # ------------------------
@@ -89,7 +73,7 @@ def extract_tool(response_text):
 def build_decision_prompt(user_query):
     today = date.today().isoformat()
     return f"""
-You are a financial assistant agent. Todai is {today}
+You are a financial assistant agent. Today is {today}
 
 You MUST choose ONE tool, and extract any date from user message.
 
@@ -98,7 +82,6 @@ TOOLS:
 - get_category_breakdown
 - get_anomalies
 - get_overspending
-- get_date_range
 
 USER QUESTION:
 {user_query}
