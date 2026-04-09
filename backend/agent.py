@@ -105,6 +105,9 @@ The user asked:
 Here is the computed data:
 {tool_result}
 
+IMPORTANT: Negative amounts represent expenses (money spent). Positive amounts represent income.
+When explaining spending, use absolute values and say "spent $X" not "-$X".
+
 Explain the answer clearly and give a useful insight.
 
 Do NOT mention tools.
