@@ -5,7 +5,7 @@ async function uploadFile() {
 
     
     btn.disabled = true;
-    btn.textContent - "Processing...";
+    btn.textContent = "Processing...";
     const report = document.getElementById("reportOutput");
     report.innerHTML = `<p>Analysing your transactions...</p>`;
 
@@ -21,7 +21,9 @@ async function uploadFile() {
 
     if (!response.ok) {
         const error = await response.json();
-        report.innerHTML = `<p style="color:red";>Error ${error.detail}</p>`;
+        report.innerHTML = `<p style="color:red;">Error ${error.detail}</p>`;
+        btn.disabled = false;
+        btn.textContent ="Upload CSV";
         return;
     }
 
