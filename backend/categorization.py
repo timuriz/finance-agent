@@ -46,7 +46,4 @@ def categorize_transaction_fallback(description):
             if keyword in description:
                 return category
     
-    return "other"
-
-
-print(categorize_transaction("rent transfer"))
+    return "other"s

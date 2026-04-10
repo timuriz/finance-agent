@@ -40,6 +40,7 @@ async def analyze(file: UploadFile, currency = Form(default="USD")):
         "total": total,
         "total_display": f"+{total:.2f}" if total > 0 else f"{total:.2f}",
         "categories": spending_by_category(df).to_dict(),
+        "confidence": df.groupby("category")["confidence"].mean().round().astype(int).to_dict()
         }
 
 

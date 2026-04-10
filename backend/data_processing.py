@@ -152,14 +152,17 @@ def process_data(path):
     df = normalize_amount(df)
     df = clean_data(df)
 
-    cols = ["date", "description", "amount", "type"]
+    df[["category", "confidence"]] = df["description"].apply(
+        lambda d: pd.Series(categorize_transaction(d))
+    )
+
+    cols = ["date", "description", "amount", "type", "category", "confidence"]
+
     if "currency" in df.columns:
         cols.append("currency")
     df = df[cols]
 
-    df[["category", "confidence"]] = df["description"] = df["description"].apply(
-        lambda d: pd.Series(categorize_transaction(d))
-    )
+    return df
 
 if __name__ == "__main__":
     from report import generate_report
