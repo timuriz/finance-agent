@@ -46,4 +46,4 @@ def categorize_transaction_fallback(description):
             if keyword in description:
                 return category
     
-    return "other"s
+    return "other"

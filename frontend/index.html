@@ -12,15 +12,17 @@
     <!-- Upload -->
     <div class="card">
         <h2>Upload Transactions</h2>
-        <input type="file" id="fileInput">
-        <button id="uploadBtn" onclick="uploadFile()">Upload CSV</button>
-        <select id="currencySelect">
-            <option value="USD">USD</option>
-            <option value="EUR">EUR</option>
-            <option value="GBP">GBP</option>
-            <option value="JPY">JPY</option>
-            <option value="UAH">UAH</option>
-        </select>
+        <div class="upload-row">
+            <input type="file" id="fileInput" accept=".csv">
+            <select id="currencySelect">
+                <option value="USD">USD</option>
+                <option value="EUR">EUR</option>
+                <option value="GBP">GBP</option>
+                <option value="JPY">JPY</option>
+                <option value="UAH">UAH</option>
+            </select>
+            <button id="uploadBtn" onclick="uploadFile()">Upload CSV</button>
+        </div>
     </div>
 
     <!-- Report -->

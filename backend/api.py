@@ -34,14 +34,25 @@ async def analyze(file: UploadFile, currency = Form(default="USD")):
     CHAT_HISTORY = []
 
 
-    total = total_spent(df)
+    income = round(df[df["type"] == "credit"]["amount"].sum(), 2)
+    expenses_df = df[df["type"] == "debit"].copy()
+    expenses = round(abs(expenses_df["amount"].sum()), 2)
+    net_balance = round(income - expenses, 2)
+
+    category_totals = (
+        expenses_df.groupby("category")["amount"].sum().abs().sort_values(ascending=False)
+    )
+    category_confidence = (
+        expenses_df.groupby("category")["confidence"].mean().round().astype(int)
+    )
 
     return {
-        "total": total,
-        "total_display": f"+{total:.2f}" if total > 0 else f"{total:.2f}",
-        "categories": spending_by_category(df).to_dict(),
-        "confidence": df.groupby("category")["confidence"].mean().round().astype(int).to_dict()
-        }
+        "income": income,
+        "expenses": expenses,
+        "net_balance": net_balance,
+        "categories": category_totals.to_dict(),
+        "confidence": category_confidence.to_dict(),
+    }
 
 
 @app.post("/chat")
