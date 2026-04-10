@@ -20,5 +20,4 @@ _model_path = os.path.join(_dir, "..", "models", "category_model.pkl")
 
 with open(_model_path, "wb") as f:
     pickle.dump((vectorizer, model), f)
-
 print("Model trained and saved")

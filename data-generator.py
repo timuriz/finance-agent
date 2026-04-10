@@ -1,8 +1,18 @@
+"""
+Synthetic transaction data generator.
+Produces richly varied bank-statement descriptions for training the
+TF-IDF + Logistic Regression categorisation model.
+
+Run:  python data-generator.py
+Out:  data/synthetic_transactions_v2.csv
+"""
+
 import random
+import string
 import pandas as pd
 
-# ✅ New categories
-categories = [
+# ── Categories ────────────────────────────────────────────────────────────────
+CATEGORIES = [
     "groceries",
     "cafe_restaurant",
     "transport",
@@ -10,222 +20,439 @@ categories = [
     "shopping",
     "health",
     "bills_utilities",
-    "income"
+    "income",
 ]
 
-# ✅ Merchants + generic sources
-merchants = {
+# ── Merchants ─────────────────────────────────────────────────────────────────
+MERCHANTS = {
     "groceries": [
-        "Lidl", "Tesco", "Carrefour", "Aldi", "BILLA", "SPAR",
-        "supermarket", "grocery store", "mini market"
+        # Discount / budget
+        "Lidl", "Aldi", "Netto", "Penny", "Asda",
+        # Mid-range
+        "Tesco", "Sainsbury's", "Carrefour", "Rewe", "Edeka",
+        "BILLA", "SPAR", "Coop", "Migros", "Kaufland",
+        # Premium / organic
+        "Whole Foods", "Trader Joe's", "Waitrose", "M&S Food",
+        "Marks Spencer", "Naturkost", "Bio Company",
+        # Generic
+        "supermarket", "grocery store", "mini market",
+        "food market", "corner shop", "local market",
     ],
 
     "cafe_restaurant": [
-        "Starbucks", "McDonald's", "KFC", "Subway",
+        # Coffee chains
+        "Starbucks", "Costa Coffee", "Pret a Manger", "Caffe Nero",
+        "Tim Hortons", "Dunkin", "Greggs",
+        # Fast food
+        "McDonald's", "Burger King", "KFC", "Subway", "Five Guys",
+        "Shake Shack", "Wendy's", "Popeyes", "Chick-fil-A",
+        # Pizza
+        "Pizza Hut", "Domino's", "Papa John's", "Pizza Express",
+        # Casual dining
+        "Nando's", "Wagamama", "Chipotle", "Olive Garden",
+        "TGI Friday's", "Applebee's", "Chili's", "itsu", "Leon",
+        # Asian
+        "sushi bar", "ramen shop", "dim sum", "Thai restaurant",
+        "Indian takeaway", "Chinese restaurant",
+        # Generic
         "restaurant", "cafe", "bistro", "pizzeria",
-        "burger place", "sushi bar", "kebab shop",
-        "pub", "beer bar", "wine bar", "brasserie"
+        "burger joint", "kebab shop", "brasserie",
+        "wine bar", "pub", "tapas bar", "diner",
+        "food truck", "street food", "bakery",
     ],
 
     "transport": [
-        "Uber", "Bolt", "metro", "bus", "tram",
-        "taxi", "train", "Trainline", "fuel",
-        "gas station", "parking"
+        # Ride-hailing
+        "Uber", "Bolt", "Lyft", "Free Now", "Cabify",
+        # Rail / metro
+        "National Rail", "Eurostar", "Deutsche Bahn", "SNCF",
+        "Renfe", "Trenitalia", "TfL", "metro", "tram",
+        # Bus / coach
+        "FlixBus", "Megabus", "National Express", "Greyhound",
+        # Air
+        "Ryanair", "EasyJet", "Wizz Air", "Vueling",
+        # Car rental
+        "Hertz", "Sixt", "Enterprise", "Avis", "Europcar",
+        # Fuel
+        "Shell", "BP", "Total", "Esso", "Texaco",
+        "Q8", "Neste", "Orlen", "Circle K",
+        # Parking / toll
+        "parking", "car park", "toll gate",
+        # Generic
+        "taxi", "bus", "train", "ferry",
     ],
 
     "entertainment": [
-        "Netflix", "Spotify", "cinema", "movie theater",
-        "concert", "festival", "bowling", "arcade",
-        "theatre", "museum", "nightclub", "gaming"
+        # Streaming – video
+        "Netflix", "HBO Max", "Disney+", "Apple TV+",
+        "Amazon Prime Video", "Hulu", "Paramount+",
+        "Peacock", "Crunchyroll", "MUBI",
+        # Streaming – music
+        "Spotify", "Apple Music", "Tidal", "Deezer",
+        "YouTube Premium", "Amazon Music",
+        # Gaming
+        "Steam", "PlayStation", "Xbox", "Nintendo",
+        "Epic Games", "GOG", "Humble Bundle",
+        "Twitch", "Roblox",
+        # Venues
+        "cinema", "AMC", "Odeon", "Vue Cinema",
+        "Cinepolis", "Cineworld",
+        "concert venue", "theatre", "opera house",
+        "museum", "art gallery", "science center",
+        # Activities
+        "bowling", "escape room", "laser tag",
+        "mini golf", "trampoline park",
+        "nightclub", "festival", "comedy club",
     ],
 
     "shopping": [
-        "Amazon", "Zalando", "mall",
-        "clothing store", "electronics store",
-        "online shop", "market"
+        # Fashion
+        "Zara", "H&M", "ASOS", "Shein", "Uniqlo",
+        "Gap", "Mango", "Primark", "Next", "Topshop",
+        "Nike", "Adidas", "Puma", "Under Armour",
+        "Ralph Lauren", "Tommy Hilfiger",
+        # Online marketplaces
+        "Amazon", "eBay", "Etsy", "AliExpress",
+        "Wish", "Vinted",
+        # Electronics
+        "Apple Store", "MediaMarkt", "Currys", "Best Buy",
+        "Fnac", "Saturn", "Elkjøp",
+        # Home & furniture
+        "IKEA", "Wayfair", "Habitat", "John Lewis",
+        # Beauty
+        "Sephora", "Douglas", "Boots Beauty", "MAC Cosmetics",
+        "L'Occitane",
+        # Sport / outdoor
+        "Decathlon", "REI", "Sports Direct",
+        # Generic
+        "online shop", "clothing store", "electronics store",
+        "department store", "outlet store",
     ],
 
     "health": [
-        "pharmacy", "hospital", "clinic",
-        "dentist", "gym", "fitness",
-        "medication", "doctor"
+        # Pharmacy chains
+        "Boots", "Walgreens", "CVS", "Lloyds Pharmacy",
+        "dm Drogerie", "Rossmann",
+        # Insurance / health providers
+        "Bupa", "AXA Health", "Cigna", "Vitality",
+        "Nuffield Health", "Aviva Health",
+        # Gyms / fitness
+        "PureGym", "David Lloyd", "Anytime Fitness",
+        "Planet Fitness", "CrossFit", "Equinox",
+        "LA Fitness", "Curves",
+        # Supplements / nutrition
+        "MyProtein", "Holland Barrett", "GNC",
+        "Bulk Powders", "iHerb",
+        # Medical / dental
+        "dentist", "GP surgery", "clinic",
+        "hospital", "optician", "physiotherapy",
+        "blood test", "laboratory", "specialist",
+        # Wellness
+        "yoga studio", "pilates", "spa",
+        "mental health app", "therapy",
     ],
 
     "bills_utilities": [
-        "rent", "electricity", "water bill",
-        "internet", "wifi", "mobile bill",
-        "insurance", "utilities"
+        # Energy
+        "EDF", "British Gas", "E.ON", "npower",
+        "RWE", "Engie", "ENEL", "Vattenfall",
+        "SSE", "Octopus Energy",
+        # Water
+        "Thames Water", "Severn Trent", "Anglian Water",
+        "Scottish Water",
+        # Broadband / TV
+        "BT", "Virgin Media", "Sky", "TalkTalk",
+        "Vodafone Home", "Deutsche Telekom",
+        "Orange", "Swisscom",
+        # Mobile
+        "O2", "EE", "Three", "Vodafone",
+        "AT&T", "Verizon", "T-Mobile",
+        # Insurance
+        "AXA Insurance", "Allianz", "Aviva",
+        "Direct Line", "LV Insurance",
+        "Admiral", "Zurich",
+        # Housing
+        "rent", "landlord payment", "mortgage",
+        "council tax", "home insurance",
+        # Generic
+        "utilities", "electricity bill", "gas bill",
+        "water bill", "broadband", "phone bill",
     ],
 
     "income": [
-        "salary", "freelance", "bonus",
-        "refund", "cashback"
-    ]
+        # Salary / employment
+        "salary", "payroll", "wage", "monthly pay",
+        "employer", "company payroll",
+        # Freelance / gig
+        "Upwork", "Fiverr", "Toptal", "PeoplePerHour",
+        "freelance payment", "contractor fee",
+        # Platforms / marketplace
+        "Stripe payout", "PayPal transfer",
+        "Revolut transfer", "Wise transfer",
+        # Investments
+        "dividend", "interest payment",
+        "investment return", "broker payout",
+        # Refunds / cashback
+        "refund", "cashback", "tax rebate",
+        "VAT refund", "government payment",
+        # Rental income
+        "rental income", "Airbnb payout",
+        # Bonuses
+        "bonus", "commission", "incentive payment",
+        "performance bonus",
+    ],
 }
 
-# ✅ Strong keyword layer (VERY IMPORTANT)
-keywords = {
+# ── Keywords (strong category signals) ───────────────────────────────────────
+KEYWORDS = {
     "groceries": [
-        "groceries", "food shopping", "weekly shop",
-        "vegetables", "fruits", "milk", "bread", "market", "supermarket"
+        "groceries", "grocery", "food shopping", "weekly shop",
+        "supermarket run", "vegetables", "fruits", "dairy",
+        "milk", "bread", "eggs", "meat", "produce",
+        "fresh food", "organic", "bulk food",
     ],
 
     "cafe_restaurant": [
-        "pizza", "burger", "coffee", "dinner", "coffee"
-        "lunch", "breakfast", "brunch",
-        "beer", "drinks", "wine", "takeaway",
-        "delivery", "snack", "meal"
+        "coffee", "latte", "espresso", "cappuccino",
+        "lunch", "dinner", "breakfast", "brunch",
+        "burger", "pizza", "pasta", "sushi", "ramen",
+        "kebab", "takeaway", "delivery meal", "dine in",
+        "beer", "wine", "cocktail", "drinks",
+        "snack", "dessert", "cake", "sandwich",
     ],
 
     "transport": [
-        "ride", "trip", "ticket", "fare",
-        "commute", "fuel", "gas", "parking"
+        "ride", "journey", "trip", "commute",
+        "ticket", "fare", "pass", "travel card",
+        "fuel", "petrol", "diesel", "charging",
+        "parking fee", "toll", "ferry crossing",
+        "airport transfer", "shuttle",
     ],
 
     "entertainment": [
-        "concert", "cinema", "movie", "ticket",
-        "bowling", "game", "festival",
-        "party", "club", "event", "show"
+        "subscription", "streaming", "membership",
+        "movie", "film", "series", "show",
+        "concert ticket", "gig", "festival pass",
+        "game", "gaming", "dlc", "in-app purchase",
+        "bowling", "escape room", "event ticket",
+        "night out", "club entry",
     ],
 
     "shopping": [
-        "clothes", "shoes", "electronics",
-        "order", "purchase", "online order",
-        "delivery", "package"
+        "clothes", "clothing", "shoes", "sneakers",
+        "jacket", "dress", "shirt", "trousers",
+        "electronics", "laptop", "phone", "headphones",
+        "gadget", "appliance",
+        "online order", "purchase", "delivery",
+        "gift", "accessories", "jewellery",
+        "furniture", "homeware", "kitchenware",
     ],
 
     "health": [
-        "medicine", "treatment", "checkup",
-        "workout", "training", "supplements"
+        "medicine", "medication", "prescription",
+        "vitamins", "supplements", "protein",
+        "gym", "workout", "fitness class",
+        "doctor visit", "dental", "checkup",
+        "physio", "therapy", "massage",
+        "health insurance", "medical",
     ],
 
     "bills_utilities": [
-        "monthly", "invoice", "bill",
-        "subscription", "payment"
+        "monthly bill", "direct debit", "standing order",
+        "rent payment", "mortgage payment",
+        "electricity", "gas", "water",
+        "broadband bill", "phone plan",
+        "insurance premium", "council tax",
+        "subscription renewal", "annual fee",
     ],
 
     "income": [
-        "salary", "payout", "transfer",
-        "received", "deposit"
-    ]
+        "salary received", "wage credit",
+        "freelance income", "project payment",
+        "payout", "transfer received",
+        "refund received", "cashback credited",
+        "dividend payment", "interest credited",
+        "bonus received", "commission paid",
+    ],
 }
 
-# ✅ Noise (bank realism)
-noise_tokens = [
-    "POS", "TXN", "ONLINE", "CARD", "VISA",
-    "MASTERCARD", "DEBIT", "CREDIT",
-    "SEPA", "IBAN", "APP", "WEB",
-    "PAYPAL", "STRIPE", "ECOM"
+# ── Bank-statement noise ──────────────────────────────────────────────────────
+NOISE_TOKENS = [
+    "POS", "TXN", "ONLINE", "CARD", "VISA", "MASTERCARD",
+    "DEBIT", "CREDIT", "SEPA", "IBAN", "APP", "WEB",
+    "PAYPAL", "STRIPE", "ECOM", "CONTACTLESS",
+    "RECURRING", "AUTOPAY", "DIRECT DEBIT",
 ]
 
-locations = [
-    "LONDON", "PARIS", "BERLIN", "MADRID",
-    "ROME", "AMSTERDAM", "VIENNA",
-    "EU", "EUR", "SEPA", ""
+LOCATIONS = [
+    "LONDON", "PARIS", "BERLIN", "MADRID", "ROME",
+    "AMSTERDAM", "VIENNA", "WARSAW", "PRAGUE",
+    "DUBLIN", "LISBON", "BRUSSELS", "STOCKHOLM",
+    "NEW YORK", "LOS ANGELES", "CHICAGO",
+    "EU", "GB", "DE", "FR", "US", "",
 ]
 
-actions = [
-    "payment", "purchase", "charge",
-    "txn", "order", "subscription", "fee"
+ACTIONS = [
+    "payment", "purchase", "charge", "txn",
+    "order", "subscription", "fee", "transfer",
+    "debit", "credit", "invoice",
 ]
 
-# ✅ Amount logic (optional but powerful)
-amount_ranges = {
-    "groceries": (-120, -20),
-    "cafe_restaurant": (-60, -5),
-    "transport": (-40, -2),
-    "entertainment": (-120, -10),
-    "shopping": (-400, -20),
-    "health": (-200, -10),
-    "bills_utilities": (-1200, -30),
-    "income": (500, 4000)
+# ── Amount ranges ─────────────────────────────────────────────────────────────
+AMOUNT_RANGES = {
+    "groceries":       (-130,  -10),
+    "cafe_restaurant": (-65,    -3),
+    "transport":       (-80,    -2),
+    "entertainment":   (-150,   -5),
+    "shopping":        (-500,  -15),
+    "health":          (-250,   -5),
+    "bills_utilities": (-1500, -30),
+    "income":          (400,  6000),
 }
 
-def random_case(text):
-    return random.choice([str.lower, str.upper, str.title])(text)
+# ── Category weights (income is naturally rarer) ──────────────────────────────
+WEIGHTS = {
+    "groceries":       12,
+    "cafe_restaurant": 14,
+    "transport":       13,
+    "entertainment":   11,
+    "shopping":        13,
+    "health":          10,
+    "bills_utilities": 11,
+    "income":           6,
+}
+
+_CATEGORIES_POOL = [c for c, w in WEIGHTS.items() for _ in range(w)]
+
+
+def _ref_number():
+    """Short alphanumeric reference as seen in real bank statements."""
+    return "".join(random.choices(string.ascii_uppercase + string.digits, k=random.randint(6, 10)))
+
+
+def _random_case(text):
+    choice = random.random()
+    if choice < 0.40:
+        return text.upper()
+    elif choice < 0.70:
+        return text.title()
+    else:
+        return text.lower()
+
 
 def generate_amount(category):
-    low, high = amount_ranges[category]
-    return round(random.uniform(low, high), 2)
+    lo, hi = AMOUNT_RANGES[category]
+    return round(random.uniform(lo, hi), 2)
 
-def generate_sample():
-    category = random.choice(categories)
 
-    merchant = random.choice(merchants[category])
-    keyword = random.choice(keywords[category])
-    noise = random.choice(noise_tokens)
-    location = random.choice(locations)
-    action = random.choice(actions)
+def generate_description(category):
+    merchant = random.choice(MERCHANTS[category])
+    keyword  = random.choice(KEYWORDS[category])
+    noise    = random.choice(NOISE_TOKENS)
+    location = random.choice(LOCATIONS)
+    action   = random.choice(ACTIONS)
+    ref      = _ref_number()
 
     patterns = [
-
-        # --- CLEAN HUMAN STYLE ---
-        f"{merchant}",
-        f"{keyword}",
+        # ── Plain human descriptions ──────────────────────────────────────
+        merchant,
+        keyword,
         f"{merchant} {keyword}",
-        f"{keyword} {merchant}",
+        f"{keyword} at {merchant}",
+        f"{keyword} from {merchant}",
 
-        # --- SOCIAL / CONTEXT ---
+        # ── Contextual / social ───────────────────────────────────────────
         f"{merchant} with friends",
-        f"{keyword} night",
-        f"{merchant} weekend",
+        f"{keyword} outing",
+        f"{merchant} visit",
         f"{keyword} downtown",
+        f"{keyword} near work",
 
-        # --- FOOD / ACTIVITY ---
-        f"{keyword} dinner",
-        f"{keyword} lunch",
-        f"{keyword} drinks",
-        f"{keyword} takeaway",
+        # ── Activity combos ───────────────────────────────────────────────
+        f"{merchant} - {keyword}",
+        f"{keyword} ({merchant})",
+        f"{merchant} / {keyword}",
 
-        # --- EVENTS ---
-        f"{keyword} tickets",
-        f"{keyword} event",
-        f"{merchant} entry",
-
-        # --- SHOPPING ---
-        f"bought at {merchant}",
-        f"shopping {merchant}",
-        f"{keyword} order",
-
-        # --- BILLS ---
+        # ── Bills / recurring ─────────────────────────────────────────────
         f"{merchant} monthly",
         f"{merchant} bill",
         f"{merchant} payment",
+        f"DD {merchant}",
+        f"Direct Debit {merchant}",
+        f"SO {merchant}",
+        f"Standing Order {merchant}",
+        f"{merchant} direct debit",
+        f"{merchant} auto-renewal",
 
-        # --- INCOME ---
+        # ── Income patterns ───────────────────────────────────────────────
         f"{merchant} received",
-        f"{merchant} transfer",
+        f"{merchant} inbound transfer",
+        f"Credit {merchant}",
+        f"Payment from {merchant}",
+        f"{keyword} credited",
 
-        # --- BANK STYLE ---
+        # ── Shopping / order ─────────────────────────────────────────────
+        f"Order {merchant}",
+        f"Purchase {merchant}",
+        f"{merchant} online",
+        f"{merchant} delivery",
+        f"Return {merchant}",
+
+        # ── Bank statement styles ─────────────────────────────────────────
         f"{merchant} {noise}",
         f"{merchant} {noise} {location}",
         f"{merchant} {action} {noise}",
         f"{merchant}*{action[:3].upper()} {location}",
+        f"{merchant}*{ref}",
         f"{merchant}-{location}-{noise}",
         f"{merchant} {noise}/{location}",
-        f"{noise} {merchant} {keyword}"
+        f"{noise} {merchant} {keyword}",
+        f"{noise} {merchant} {location}",
+        f"{merchant} {ref} {location}",
+        f"{merchant} | {action} | {ref}",
+        f"{merchant}/{action}/{location}",
+        f"CARD PAYMENT {merchant} {location}",
+        f"CONTACTLESS {merchant}",
+        f"RECURRING {merchant}",
+        f"AUTOPAY {merchant} {action}",
+        f"{merchant} {noise} REF {ref}",
+
+        # ── Truncated merchant (realistic statement trimming) ──────────────
+        f"{merchant[:6].upper()} {location} {noise}",
     ]
 
-    description = random.choice(patterns)
+    desc = random.choice(patterns)
 
-    # 🔥 Inject extra keyword sometimes (VERY IMPORTANT)
-    if random.random() < 0.5:
-        description += f" {random.choice(keywords[category])}"
+    # Inject an extra keyword ~55% of the time (boosts bigram signal)
+    if random.random() < 0.55:
+        desc = f"{desc} {random.choice(KEYWORDS[category])}"
 
-    description = random_case(description)
+    return _random_case(desc)
 
-    amount = generate_amount(category)
 
+def generate_sample():
+    category    = random.choice(_CATEGORIES_POOL)
+    description = generate_description(category)
+    amount      = generate_amount(category)
     return description, category, amount
 
 
-def generate_dataset(n=5000):
+def generate_dataset(n: int = 50_000) -> pd.DataFrame:
     data = [generate_sample() for _ in range(n)]
-    df = pd.DataFrame(data, columns=["description", "category", "amount"])
+    df   = pd.DataFrame(data, columns=["description", "category", "amount"])
     return df
 
 
 if __name__ == "__main__":
-    df = generate_dataset(10000)
-    df.to_csv("synthetic_transactions_v2.csv", index=False)
-    print("Dataset generated:", len(df))
+    import os
+
+    out_dir  = os.path.join(os.path.dirname(__file__), "data")
+    out_path = os.path.join(out_dir, "synthetic_transactions_v2.csv")
+
+    print("Generating dataset…")
+    df = generate_dataset(50_000)
+    df.to_csv(out_path, index=False)
+
+    print(f"Saved {len(df):,} rows → {out_path}")
+    print("\nCategory distribution:")
+    print(df["category"].value_counts().to_string())

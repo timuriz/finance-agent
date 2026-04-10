@@ -37,7 +37,6 @@ def categorize_transaction(description):
     
     return "other", 0
 
-
 def categorize_transaction_fallback(description):
     description = description.lower().strip().replace(" ", "_")
 
