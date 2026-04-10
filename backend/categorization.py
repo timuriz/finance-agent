@@ -20,22 +20,22 @@ def categorize_transaction(description):
 
     try:
         X = vectorizer.transform([description])
-    
         probs = model.predict_proba(X)[0]
         max_prob = max(probs)
         
         if max_prob > 0.4:
-            return model.predict(X)[0].lower()
+            category = model.predict(X)[0].lower()
+            return category, round(max_prob * 100)
     except Exception as e:
         pass
-    description = description.lower().strip().replace(" ", "_")
 
+    description = description.lower().strip().replace(" ", "_")
     for category, keywords in CATEGORY_RULES.items():
         for keyword in keywords:
             if keyword in description:
-                return category
+                return category, 100
     
-    return "other"
+    return "other", 0
 
 
 def categorize_transaction_fallback(description):
