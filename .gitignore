@@ -69,4 +69,9 @@ node_modules/
 npm-debug.log*
 yarn-error.log
 .npm
+
+# ── Stale docs assets ─────────────────────────────────────────────────────────
+docs/finance-agent1.gif
+docs/screenshot-categories.png
+docs/screenshot-chat.png
 .md
