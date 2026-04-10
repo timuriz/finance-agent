@@ -157,8 +157,9 @@ def process_data(path):
         cols.append("currency")
     df = df[cols]
 
-    df["category"] = df["description"].apply(categorize_transaction)
-    return df
+    df[["category", "confidence"]] = df["description"] = df["description"].apply(
+        lambda d: pd.Series(categorize_transaction(d))
+    )
 
 if __name__ == "__main__":
     from report import generate_report
