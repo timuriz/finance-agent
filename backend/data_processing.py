@@ -143,6 +143,9 @@ def detect_overspending(df):
     percentages = category_by_percentage(df)
     return percentages[percentages > 30]
 
+def spending_by_month(df):
+    return df.groupby(df["date"].dt.to_period("M"))["amount"].sum().sort_index()
+
 def process_data(path):
     df = load_data(path)
     df = map_columns(df)

@@ -2,7 +2,8 @@ from data_processing import (
     total_spent,
     top_category,
     spending_by_category,
-    detect_overspending
+    detect_overspending,
+    spending_by_month
 )
 from anomaly_detection import detect_anomalies
 import json
@@ -31,6 +32,7 @@ TOOLS = {
     "get_category_breakdown": "Returns spending per category",
     "get_anomalies": "Returns unusual transactions",
     "get_overspending": "Returns categories with high spending",
+    "get_spending_by_month": "Returns total spend by given month",
     "none": "Answer from conversation history",
 }
 
@@ -56,6 +58,9 @@ def get_anomalies_tool(df):
 def get_overspending_tool(df):
     return detect_overspending(df).to_dict()
 
+def get_spending_by_month(df):
+    return spending_by_month(df).to_dict()
+
 
 # ------------------------
 # TOOL EXECUTION
@@ -73,6 +78,9 @@ def execute_tool(tool_name, df):
 
     elif tool_name == "get_overspending":
         return get_overspending_tool(df)
+
+    elif tool_name == "get_spending_by_month":
+        return get_spending_by_month(df);
 
     else:
         return {"error": "Unknown tool"}

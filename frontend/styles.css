@@ -287,6 +287,8 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
 .chat-input input::placeholder { color: var(--text-secondary); }
 .chat-input input:focus        { outline: none; border-color: var(--blue); }
 
+.chart-bar.monthly { background: var(--green);}
+
 /* ── Scrollbar ──────────────────────────────────────────────────────────── */
 ::-webkit-scrollbar       { width: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }

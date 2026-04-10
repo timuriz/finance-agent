@@ -1,7 +1,13 @@
 from fastapi import FastAPI, UploadFile, Form, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 import io
-from data_processing import process_data, total_spent, spending_by_category, convert_to_base
+from data_processing import (
+    process_data, 
+    total_spent, 
+    spending_by_category, 
+    convert_to_base,
+    spending_by_month
+    )
 from agent import run_agent
 
 app = FastAPI()
@@ -29,6 +35,7 @@ async def analyze(file: UploadFile, currency = Form(default="USD")):
         raise HTTPException(status_code=400, detail=str(e))
 
 
+
     global GLOBAL_DF, CHAT_HISTORY
     GLOBAL_DF = df
     CHAT_HISTORY = []
@@ -38,6 +45,10 @@ async def analyze(file: UploadFile, currency = Form(default="USD")):
     expenses_df = df[df["type"] == "debit"].copy()
     expenses = round(abs(expenses_df["amount"].sum()), 2)
     net_balance = round(income - expenses, 2)
+
+    monthly = spending_by_month(df)
+    monthly_dict = {str(k): round(abs(v), 2) for k, v in monthly.items()}
+
 
     category_totals = (
         expenses_df.groupby("category")["amount"].sum().abs().sort_values(ascending=False)
@@ -52,6 +63,7 @@ async def analyze(file: UploadFile, currency = Form(default="USD")):
         "net_balance": net_balance,
         "categories": category_totals.to_dict(),
         "confidence": category_confidence.to_dict(),
+        "monthly": monthly_dict,
     }
 
 

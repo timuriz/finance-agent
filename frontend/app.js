@@ -86,10 +86,29 @@ async function uploadFile() {
     })
     .join("");
 
+const monthlyRows = Object.entries(data.monthly)
+    .sort(([a], [b]) => a.localeCompare(b))   // sort "2024-01" < "2024-02" chronologically
+    .map(([month, amount]) => {
+        const pct = ((amount / Math.max(...Object.values(data.monthly))) * 100).toFixed(1);
+        const label = new Date(month + "-02").toLocaleDateString("en-US", { month: "short", year: "numeric" });
+        return `
+            <div class="chart-row">
+                <span class="chart-label">${label}</span>
+                <div class="chart-bar-wrap">
+                    <div class="chart-bar-track">
+                        <div class="chart-bar monthly" style="width:${pct}%"></div>
+                    </div>
+                    <span class="chart-value">${fmt(amount)}</span>
+                </div>
+            </div>`;
+    }).join("");
+
   report.innerHTML = `
     ${summaryHTML}
-    <div class="section-header">Expenses by category</div>
+    <div class="section-header">Expenses by category</div> 
     <div class="chart">${chartRows}</div>
+    <div class="section-header" style="margin-top: 32px;">Monthly spending</div>
+    <div class="chart">${monthlyRows}</div>
     <div class="legend">
       <div class="legend-item">
         <span class="legend-dot" style="background:#30d158;"></span>

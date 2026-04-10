@@ -6,6 +6,7 @@ import os
 
 df = pd.read_csv("../data/synthetic_transactions_v2.csv")
 
+
 x = df["description"]
 y = df["category"]
 
