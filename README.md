@@ -1,26 +1,39 @@
 # Finance Agent
 
-A personal finance analysis tool that lets you upload a bank transaction CSV, automatically categorises every transaction with a trained ML model, detects anomalies, and lets you ask plain-English questions answered by an LLM agent powered by Google Gemini.
+A personal finance analysis tool — upload a bank transaction CSV, get an instant dark-themed dashboard with income vs. spend breakdown, ML-powered categorisation with per-category confidence scores, anomaly detection, and a Gemini-powered AI chat agent you can question in plain English.
 
 ---
 
-## Screenshots
+## Demo
 
-### Spending by Category
-(<img width="848" height="743" alt="screenshot-categories" src="https://github.com/user-attachments/assets/fdfaa1c8-b667-4d3d-8875-0f23451fb402" />)
-
-### AI Chat
-(<img width="853" height="726" alt="screenshot-chat" src="https://github.com/user-attachments/assets/3c6c8987-b8e4-45f9-b581-66429f97209e"/>)
+![Finance Agent demo](docs/finance-agent.gif)
 
 ---
 
 ## Features
 
-- **CSV upload** — paste in any bank export and get an instant spending breakdown
-- **ML categorisation** — a TF-IDF + Logistic Regression model classifies transactions into categories (food, transport, health, entertainment, shopping, and more)
-- **Anomaly detection** — flags transactions that deviate more than 2 standard deviations from your average spend
-- **Spending summary** — total spend and per-category breakdown served via REST API
-- **AI chat agent** — ask natural-language questions ("Why did I overspend in March?") and get data-backed answers via a Gemini-powered tool-use agent
+### Dashboard
+- **Income / Expenses / Net balance** summary cards at a glance
+- **Spending bar chart** — all bars share a fixed left baseline so amounts are directly comparable
+- **Multi-currency support** — select USD, EUR, GBP, JPY, UAH before upload; live exchange-rate conversion applied automatically
+
+### ML Categorisation
+- **TF-IDF + Logistic Regression** model trained on 50 000 synthetic bank-statement descriptions
+- **8 categories** — groceries, café & restaurant, transport, entertainment, shopping, health, bills & utilities, income
+- **Confidence score** shown inline per category (green ≥ 80 % / orange 50–79 % / red < 50 %)
+- **"Review" badge** on any category where AI confidence is below 50 % so you know what to check manually
+- **Keyword fallback** — if ML confidence is too low the categoriser falls back to an extensive keyword ruleset covering 100 + merchant names and phrases
+- **Smart column mapping** — accepts CSVs with non-standard headers (`operation_amount`, `transaction_date`, `details`, etc.) and maps them automatically
+
+### AI Chat Agent
+- Ask questions in natural language: *"Why did I overspend in March?"*, *"What were my biggest anomalies?"*
+- Agent selects the right tool automatically (`get_summary`, `get_category_breakdown`, `get_anomalies`, `get_overspending`, `get_date_range`) and passes computed data to Gemini for a clear, concise answer
+- **Date-range filtering** — questions like *"show me spending between Jan 1 and Feb 28"* are parsed and applied automatically
+- Chat history preserved for the session
+
+### Data & Privacy
+- **Anomaly detection** — flags transactions > 2 standard deviations from your mean spend
+- All analysis runs **locally** — no transaction data leaves your machine; only natural-language questions are sent to the Gemini API
 
 ---
 
@@ -28,11 +41,12 @@ A personal finance analysis tool that lets you upload a bank transaction CSV, au
 
 | Layer | Technology |
 |---|---|
-| Backend API | FastAPI |
-| ML model | scikit-learn (TF-IDF + Logistic Regression) |
+| Backend API | FastAPI + Uvicorn |
+| ML model | scikit-learn (TF-IDF · Logistic Regression) |
 | LLM / AI agent | Google Gemini (`gemini-3-flash-preview`) |
 | Frontend | Vanilla HTML / CSS / JavaScript |
-| Data | Synthetic CSV transactions (generated locally) |
+| Config | python-dotenv |
+| Data generation | Custom synthetic generator (50 k rows, 8 categories) |
 
 ---
 
@@ -41,23 +55,26 @@ A personal finance analysis tool that lets you upload a bank transaction CSV, au
 ```
 finance-agent/
 ├── backend/
-│   ├── api.py               # FastAPI app — /analyze and /chat endpoints
+│   ├── api.py               # FastAPI — /analyze and /chat endpoints
 │   ├── agent.py             # LLM tool-use agent (decision + execution loop)
-│   ├── categorization.py    # ML-based transaction categoriser
-│   ├── anomaly_detection.py # Statistical anomaly detection
-│   ├── data_processing.py   # Aggregation helpers (totals, categories, date range)
-│   ├── llm_insights.py      # One-shot LLM insight generator
+│   ├── categorization.py    # ML categoriser + keyword fallback
+│   ├── anomaly_detection.py # Statistical anomaly detection (2σ)
+│   ├── data_processing.py   # Column mapping, cleaning, aggregation helpers
+│   ├── llm_insights.py      # One-shot Gemini insight generator
 │   ├── report.py            # Report formatting
-│   └── train_model.py       # Model training script
+│   ├── train_model.py       # Model training script
+│   └── config.py            # Loads .env and exports constants
 ├── frontend/
 │   ├── index.html
-│   ├── styles.css
+│   ├── styles.css           # Dark theme, CSS variables
 │   └── app.js
 ├── models/
-│   └── category_model.pkl   # Trained TF-IDF + LR model (git-ignored)
+│   └── category_model.pkl   # Trained model (git-ignored)
 ├── data/                    # CSV files (git-ignored)
+├── docs/                    # Demo gif and assets
 ├── data-generator.py        # Synthetic transaction generator
-└── docs/                    # Screenshots and assets
+├── .env.example             # Environment variable template
+└── .gitignore
 ```
 
 ---
@@ -67,7 +84,7 @@ finance-agent/
 ### Prerequisites
 
 - Python 3.10+
-- A Google Gemini API key
+- A [Google Gemini API key](https://aistudio.google.com/app/apikey)
 
 ### 1. Clone the repo
 
@@ -79,20 +96,23 @@ cd finance-agent
 ### 2. Install dependencies
 
 ```bash
-pip install fastapi uvicorn pandas scikit-learn google-generativeai python-multipart
+pip install fastapi uvicorn pandas scikit-learn google-generativeai python-multipart python-dotenv requests
 ```
 
-### 3. Set your API key
+### 3. Configure environment
 
 ```bash
-export GOOGLE_API_KEY=your_key_here
+cp .env.example .env
+# open .env and paste your Gemini API key
 ```
 
-### 4. Train the model
+### 4. Generate training data and train the model
 
 ```bash
+python data-generator.py          # writes data/synthetic_transactions_v2.csv
+
 cd backend
-python train_model.py
+python train_model.py             # trains and saves models/category_model.pkl
 ```
 
 ### 5. Start the backend
@@ -104,16 +124,30 @@ uvicorn api:app --reload
 
 ### 6. Open the frontend
 
-Open `frontend/index.html` directly in your browser, or serve it with any static file server.
+Open `frontend/index.html` directly in your browser (no build step needed).
 
 ---
 
 ## How It Works
 
-1. **Upload** a CSV file with columns `date`, `description`, `amount`.
-2. The backend **categorises** each transaction using the trained ML model, falling back to keyword rules if confidence is low.
-3. **Anomalies** are detected statistically (2σ threshold).
-4. The `/analyze` response populates the **bar chart** in the UI.
-5. Ask a question in the **chat panel** — the agent picks the right tool (`get_summary`, `get_category_breakdown`, `get_anomalies`, `get_overspending`, or `get_date_range`), runs it against your data, then passes the result to Gemini to generate a clear, concise answer.
+1. **Upload** a CSV — any export from a bank works; the column mapper handles non-standard headers (`operation_amount`, `transaction_date`, `details`, etc.)
+2. **Categorisation** — each transaction description is passed through the TF-IDF + LR model; if confidence is below the threshold the keyword fallback takes over
+3. **Income separation** — credit transactions are summed as income and excluded from the expense chart; the summary row shows income, total spent, and net balance
+4. **Anomaly detection** — transactions more than 2σ from the mean are flagged
+5. **Chart rendering** — categories are sorted by spend, bars grow from a shared baseline, confidence is shown inline
+6. **Chat** — your question goes to the agent, which decides which analytical tool to run, executes it against the in-memory DataFrame, then sends the result to Gemini to generate a plain-English answer
 
 ---
+
+## CSV Format
+
+The app accepts any CSV with at least these three pieces of information (column names are flexible):
+
+| Field | Accepted column names |
+|---|---|
+| Date | `date`, `transaction_date`, `date_time`, `when` |
+| Description | `description`, `details`, `about` |
+| Amount | `amount`, `operation_amount`, `transaction_amount`, `value`, `sum` |
+| Currency *(optional)* | `currency`, `ccy`, `operation_currency` |
+
+Amounts can be **signed** (negatives = expenses) or **unsigned** (all positive, treated as expenses).
