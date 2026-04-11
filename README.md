@@ -83,7 +83,7 @@ finance-agent/
 
 ### Prerequisites
 
-- Python 3.10+
+- **Python 3.9** (see [compatibility note](#python-version-compatibility) below)
 - A [Google Gemini API key](https://aistudio.google.com/app/apikey)
 
 ### 1. Clone the repo
@@ -96,7 +96,7 @@ cd finance-agent
 ### 2. Install dependencies
 
 ```bash
-pip install fastapi uvicorn pandas scikit-learn google-generativeai python-multipart python-dotenv requests
+pip install -r requirements.txt
 ```
 
 ### 3. Configure environment
@@ -151,3 +151,37 @@ The app accepts any CSV with at least these three pieces of information (column 
 | Currency *(optional)* | `currency`, `ccy`, `operation_currency` |
 
 Amounts can be **signed** (negatives = expenses) or **unsigned** (all positive, treated as expenses).
+
+---
+
+## Python Version Compatibility
+
+This project is developed and tested on **Python 3.9.6**. It is likely to break on Python 3.10+ due to two known issues:
+
+### 1. `google-generativeai` import changed in newer versions
+On Python 3.10+ with `google-generativeai >= 0.9`, the import style changed:
+
+```python
+# Breaks on newer installs
+from google import genai
+
+# Use this instead (works on 3.9 with google-generativeai==0.8.x)
+import google.generativeai as genai
+```
+
+### 2. `libexpat` / `pyexpat` crash on macOS + Python 3.13 (Homebrew)
+If you installed Python 3.13 via Homebrew on macOS, `pip` itself may crash with:
+```
+ImportError: dlopen(pyexpat.cpython-313-darwin.so): Symbol not found: _XML_SetAllocTrackerActivationThreshold
+```
+This is a known conflict between Homebrew's Python 3.13 and the system `libexpat`. Fix options:
+- Reinstall via `brew reinstall expat && brew reinstall python@3.13`
+- Or use the [official python.org installer](https://www.python.org/downloads/) for 3.13, which bundles its own `libexpat`
+
+### Recommended fix for Python 3.10+
+Pin the exact versions from `requirements.txt` and retrain the model after any Python or scikit-learn upgrade (the `.pkl` file is version-specific):
+
+```bash
+pip install -r requirements.txt
+cd backend && python train_model.py
+```
