@@ -146,23 +146,31 @@ async function sendMessage() {
     body: JSON.stringify({ message }),
   });
 
-  const data   = await response.json();
-  const aiMsg  = document.createElement("div");
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  // create the AI message bubble immediately (empty)
+  const aiMsg = document.createElement("div");
   aiMsg.className = "message ai";
-
-  if (!data.response) {
-    aiMsg.textContent = "⚠️ No response from AI";
-  } else {
-    const formatted = data.response
+  aiMsg.innerHTML = "<strong>AI:</strong><br>";
+  
+  // add a dedicated span for streamed text
+  const textSpan = document.createElement("span");
+  aiMsg.appendChild(textSpan);
+  chat.appendChild(aiMsg);
+  
+  while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      const text = decoder.decode(value);
+      textSpan.textContent += text;   // ← textContent, not innerHTML
+      chat.scrollTop = chat.scrollHeight;
+  }
+  
+  // after stream complete, apply markdown formatting once
+  textSpan.innerHTML = textSpan.textContent
       .replace(/\n/g, "<br>")
       .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
-    aiMsg.innerHTML = `<strong>AI:</strong><br>${formatted}`;
-  }
-
-  chat.appendChild(aiMsg);
-  chat.scrollTop = chat.scrollHeight;
 }
-
 // ── Tooltip ──────────────────────────────────────────────────────────────────
 const tip = document.createElement("div");
 tip.style.cssText =
