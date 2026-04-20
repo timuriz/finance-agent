@@ -11,7 +11,7 @@ from google import genai
 from datetime import date
 from config import GOOGLE_API_KEY
 import pandas as pd
-
+from google.genai import errors, types
 
 
 #-------------------------
@@ -20,7 +20,15 @@ import pandas as pd
 
 
 client = genai.Client(api_key=GOOGLE_API_KEY)
-MODEL = "gemini-3-flash-preview"
+MODEL = "gemini-2.5-flash"
+
+
+def _response_text(response) -> str:
+    """Access response text without triggering the multi-part candidates warning."""
+    try:
+        return response.candidates[0].content.parts[0].text
+    except (IndexError, AttributeError):
+        return response.text
 
 
 # ------------------------
@@ -38,16 +46,16 @@ TOOLS = {
 
 
 def get_summary(df):
+    expenses_only = df[df["type"] == "debit"]
     return {
-        "total_spent": abs(total_spent(df)),
-        "top_category": top_category(df)
+        "total_spent": abs(total_spent(expenses_only)),
+        "top_category": top_category(expenses_only)
     }
 
 
-
-
 def get_category_breakdown(df):
-    return spending_by_category(df).to_dict()
+    expenses_only = df[df["type"] == "debit"]
+    return spending_by_category(expenses_only).to_dict()
 
 
 def get_anomalies_tool(df):
@@ -56,7 +64,8 @@ def get_anomalies_tool(df):
 
 
 def get_overspending_tool(df):
-    return detect_overspending(df).to_dict()
+    expenses_only = df[df["type"] == "debit"]
+    return detect_overspending(expenses_only).to_dict()
 
 def get_spending_by_month(df):
     return spending_by_month(df).to_dict()
@@ -96,7 +105,7 @@ def build_decision_prompt(user_query, last_result=None):
 You are a financial assistant agent. Today is {today}
 {last_result_text}
 
-You MUST choose ONE tool,OR if the question can be answered from the last result above, use "none". and extract any date from user message.
+You MUST choose ONE tool,OR if the question can be answered from the last result above, use "none". Only set start_date/end_date if the user EXPLICITLY mentions a specific time period. If no time period is mentioned, both MUST be null.
 
 TOOLS:
 - get_summary
@@ -155,6 +164,132 @@ Be concise.
 # ------------------------
 # MAIN AGENT FUNCTION
 # ------------------------
+def run_agent_stream(user_query, df, history=None):
+    if history is None:
+        history = []
+
+    last_result = history[-1].get("result") if history else None
+    prompt = build_decision_prompt(user_query, last_result)
+   
+    response = client.models.generate_content(
+        model=MODEL,
+        contents=prompt,
+        config=types.GenerateContentConfig(
+            thinking_config=types.ThinkingConfig(thinking_budget=0)
+        )
+    )
+
+    try:
+        decision = json.loads(_response_text(response).strip())
+    except json.JSONDecodeError:
+        yield "I couldn't understand that question."
+        return
+
+    tool = decision.get("tool")
+    start_date = decision.get("start_date")
+    end_date = decision.get("end_date")
+
+    if tool not in TOOLS:
+        yield "I couldn't determine the correct tool to use."
+        return
+
+    if tool == "none":
+        tool_result = last_result or "No previous data available."
+    else:
+        filtered_df = df.copy()
+        if start_date and start_date != "null":
+            filtered_df = filtered_df[filtered_df["date"] >= pd.Timestamp(start_date)]
+        if end_date and end_date != "null":
+            filtered_df = filtered_df[filtered_df["date"] <= pd.Timestamp(end_date)]
+        if filtered_df.empty:
+            yield f"No transactions found for that period."
+            return
+        tool_result = execute_tool(tool, filtered_df)
+
+    explanation_prompt = build_explanation_prompt(user_query, tool_result, history)
+
+    # stream the explanation
+    full_answer = ""
+    try:
+        for chunk in client.models.generate_content_stream(model=MODEL, contents=explanation_prompt):
+            if chunk.text:                    # ← guard against None thinking chunks
+                full_answer += chunk.text
+                yield chunk.text
+    except errors.ServerError as e:
+        yield "The AI service is temporarily unavailable. Please try again in a moment."
+        return
+    except errors.APIError as e:
+        if e.code == 429:
+            yield "Too many requests — please wait a moment and try again."
+        else:
+            yield f"API error: {e.message}"
+        return
+    history.append({"user": user_query, "assistant": full_answer, "result": tool_result})
+    if len(history) > 5:
+        history.pop(0)
+
+async def run_agent_stream_async(user_query, df, history=None):
+    if history is None:
+        history = []
+
+    last_result = history[-1].get("result") if history else None
+    prompt = build_decision_prompt(user_query, last_result)
+
+    response = await client.aio.models.generate_content(
+        model=MODEL,
+        contents=prompt,
+        config=types.GenerateContentConfig(
+            thinking_config=types.ThinkingConfig(thinking_budget=0)
+        )
+    )
+
+    try:
+        decision = json.loads(_response_text(response).strip())
+    except json.JSONDecodeError:
+        yield "I couldn't understand that question."
+        return
+
+    tool = decision.get("tool")
+    start_date = decision.get("start_date")
+    end_date = decision.get("end_date")
+
+    if tool not in TOOLS:
+        yield "I couldn't determine the correct tool to use."
+        return
+
+    if tool == "none":
+        tool_result = last_result or "No previous data available."
+    else:
+        filtered_df = df.copy()
+        if start_date:
+            filtered_df = filtered_df[filtered_df["date"] >= pd.Timestamp(start_date)]
+        if end_date:
+            filtered_df = filtered_df[filtered_df["date"] <= pd.Timestamp(end_date)]
+        if filtered_df.empty:
+            yield "No transactions found for that period."
+            return
+        tool_result = execute_tool(tool, filtered_df)
+
+    explanation_prompt = build_explanation_prompt(user_query, tool_result, history)
+
+    full_answer = ""
+    try:
+        async for chunk in await client.aio.models.generate_content_stream(
+            model=MODEL, contents=explanation_prompt
+        ):
+            if chunk.text:
+                full_answer += chunk.text
+                yield chunk.text
+    except errors.ServerError:
+        yield "The AI service is temporarily unavailable. Please try again."
+        return
+    except errors.APIError as e:
+        yield f"Error: {e.message}"
+        return
+
+    history.append({"user": user_query, "assistant": full_answer, "result": tool_result})
+    if len(history) > 5:
+        history.pop(0)
 
 def run_agent(user_query, df, history=None):
     if history is None:
@@ -166,7 +301,7 @@ def run_agent(user_query, df, history=None):
     
     # Parse JSON from LLM
     try:
-        decision = json.loads(response.text.strip())
+        decision = json.loads(_response_text(response).strip())
     except json.JSONDecodeError:
         return {"answer": "I couldn't understand that question."}
     
@@ -192,8 +327,9 @@ def run_agent(user_query, df, history=None):
         tool_result = execute_tool(tool, filtered_df)
     
     explanation_prompt = build_explanation_prompt(user_query, tool_result, history)
+
     explanation_response = client.models.generate_content(model=MODEL, contents=explanation_prompt)
-    answer = explanation_response.text
+    answer = _response_text(explanation_response)
 
     history.append({
         "user": user_query,
@@ -202,5 +338,5 @@ def run_agent(user_query, df, history=None):
     })
     if len(history) > 5:
         history.pop(0)
-    
-    return {"decision": decision, "answer": explanation_response.text}
+
+    return {"decision": decision, "answer": answer}
