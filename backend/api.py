@@ -1,5 +1,6 @@
 from fastapi import FastAPI, UploadFile, Form, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
 import io
 from data_processing import (
     process_data, 
@@ -8,7 +9,7 @@ from data_processing import (
     convert_to_base,
     spending_by_month
     )
-from agent import run_agent
+from agent import run_agent_stream_async
 
 app = FastAPI()
 
@@ -23,6 +24,15 @@ app.add_middleware(
 GLOBAL_DF = None
 CHAT_HISTORY = []
 
+
+def my_generator():
+    yield "first chunk"
+    yield "second chunk"
+    yield "third chunk"
+
+@app.get("/stream")
+def stream():
+    return StreamingResponse(my_generator(), media_type="text/plain")
 
 @app.post("/analyze")
 async def analyze(file: UploadFile, currency = Form(default="USD")):
@@ -74,6 +84,8 @@ async def chat(request: dict):
     if GLOBAL_DF is None:
         return {"response": "Please upload your CSV first before asking question"}
 
-    result = run_agent(message, GLOBAL_DF, history=CHAT_HISTORY)
+    async def generate():
+        async for chunk in run_agent_stream_async(message, GLOBAL_DF, history=CHAT_HISTORY):
+            yield chunk
 
-    return {"response": result["answer"]}
+    return StreamingResponse(generate(), media_type="text/plain")
