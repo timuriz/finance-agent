@@ -102,10 +102,12 @@ def build_decision_prompt(user_query, last_result=None):
     today = date.today().isoformat()
     last_result_text = f"\nLast computed result: {last_result}" if last_result else ""
     return f"""
-You are a financial assistant agent. Today is {today}
+You are a financial assistant agent. Today's date is {today} (for reference only — do NOT use it to infer date ranges).
 {last_result_text}
 
-You MUST choose ONE tool,OR if the question can be answered from the last result above, use "none". Only set start_date/end_date if the user EXPLICITLY mentions a specific time period. If no time period is mentioned, both MUST be null.
+You MUST choose ONE tool, OR if the question can be answered from the last result above, use "none".
+
+CRITICAL DATE RULE: start_date and end_date MUST be null unless the user's message contains an explicit date or date range (e.g. "in January", "last month", "from March to April"). Questions about categories, savings, spending habits, or percentages do NOT imply a date range. When in doubt, use null.
 
 TOOLS:
 - get_summary
@@ -117,11 +119,11 @@ TOOLS:
 USER QUESTION:
 {user_query}
 
-Respond only with valid JSON, no markdown, no explanation:\n like:
+Respond only with valid JSON, no markdown, no explanation:
 {{
   "tool": "<tool_name>",
-  "start_date": "<YYYY-MM-DD or null>",
-  "end_date": "<YYYY-MM-DD or null>",
+  "start_date": null,
+  "end_date": null,
   "reason": "<brief reason>"
 }}
 """
@@ -197,12 +199,18 @@ def run_agent_stream(user_query, df, history=None):
         tool_result = last_result or "No previous data available."
     else:
         filtered_df = df.copy()
+        date_filtered = False
         if start_date and start_date != "null":
             filtered_df = filtered_df[filtered_df["date"] >= pd.Timestamp(start_date)]
+            date_filtered = True
         if end_date and end_date != "null":
             filtered_df = filtered_df[filtered_df["date"] <= pd.Timestamp(end_date)]
+            date_filtered = True
         if filtered_df.empty:
-            yield f"No transactions found for that period."
+            if date_filtered:
+                yield "No transactions found for that period."
+            else:
+                yield "No transaction data is available. Please upload your bank statement first."
             return
         tool_result = execute_tool(tool, filtered_df)
 
@@ -261,12 +269,18 @@ async def run_agent_stream_async(user_query, df, history=None):
         tool_result = last_result or "No previous data available."
     else:
         filtered_df = df.copy()
-        if start_date:
+        date_filtered = False
+        if start_date and start_date != "null":
             filtered_df = filtered_df[filtered_df["date"] >= pd.Timestamp(start_date)]
-        if end_date:
+            date_filtered = True
+        if end_date and end_date != "null":
             filtered_df = filtered_df[filtered_df["date"] <= pd.Timestamp(end_date)]
+            date_filtered = True
         if filtered_df.empty:
-            yield "No transactions found for that period."
+            if date_filtered:
+                yield "No transactions found for that period."
+            else:
+                yield "No transaction data is available. Please upload your bank statement first."
             return
         tool_result = execute_tool(tool, filtered_df)
 
@@ -316,9 +330,9 @@ def run_agent(user_query, df, history=None):
         tool_result = last_result or "No previous data available."
     else:
         filtered_df = df.copy()
-        if start_date:
+        if start_date and start_date != "null":
             filtered_df = filtered_df[filtered_df["date"] >= pd.Timestamp(start_date)]
-        if end_date:
+        if end_date and end_date != "null":
             filtered_df = filtered_df[filtered_df["date"] <= pd.Timestamp(end_date)]
 
         if filtered_df.empty:
