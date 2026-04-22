@@ -43,7 +43,7 @@ A personal finance analysis tool — upload a bank transaction CSV, get an insta
 |---|---|
 | Backend API | FastAPI + Uvicorn |
 | ML model | scikit-learn (TF-IDF · Logistic Regression) |
-| LLM / AI agent | Google Gemini (`gemini-3-flash-preview`) |
+| LLM / AI agent | Google Gemini (`gemini-3-flash-preview`) or you can switch to gemini-2.5-flash if you exceed your quota |
 | Frontend | Vanilla HTML / CSS / JavaScript |
 | Config | python-dotenv |
 | Data generation | Custom synthetic generator (50 k rows, 8 categories) |
